@@ -90,6 +90,9 @@ atlassian-ide-plugin.xml
 *.userosscache
 *.sln.docstates
 
+# Visual C++
+.vs/
+
 # Visual C++ cache files
 ipch/
 *.aps
