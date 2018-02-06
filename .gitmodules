@@ -1,0 +1,3 @@
+[submodule "sza"]
+	path = sza
+	url = https://github.com/kiwixz/sza.git
