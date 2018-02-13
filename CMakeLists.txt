@@ -81,11 +81,11 @@ file(GLOB LIB_ZIA_SRC ./src/*.cpp)
 file(GLOB LIB_ZIA_HEADERS ./src/*.hpp)
 
 add_library(${LIB_ZIA} ${LIB_ZIA_SRC})
-target_include_directories(${LIB_ZIA} PUBLIC "./src/")
+target_include_directories(${LIB_ZIA} PUBLIC "./src/" "./sza/")
 #add_sanitizers(${LIB_ZIA})
 
 # Build the server
 add_executable(${ZIA} main.cpp)
-target_include_directories(${ZIA} PUBLIC "./src/")
+target_include_directories(${ZIA} PUBLIC "./src/" "./sza/")
 target_link_libraries(${ZIA} ${LIB_ZIA} ${LIB_MSVCRT})
 #add_sanitizers(${ZIA})
