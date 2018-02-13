@@ -1,4 +1,5 @@
 #include "NetworkImpl.hpp"
+#include "NetworkComm.hpp"
 
 namespace zia::network 
 {
@@ -24,9 +25,9 @@ namespace zia::network
 		}
 		bool	rc = true;
 		try {
-			m_respCallback = cb;
+			NetworkComm netComm(std::move(cb), 4242); // TODO: pass config port
 			m_thread = std::make_unique<std::thread>(
-				[this](){ this->execute(); }
+				[&](){ this->execute(std::move(netComm)); }
 			);
 			m_running = true;
 		}
@@ -59,11 +60,22 @@ namespace zia::network
 		return true;
 	}
 
-	void NetworkImpl::execute() noexcept
+	void NetworkImpl::execute(NetworkComm &&netComm) noexcept
 	{
 		while (m_running)
 		{
-
+			fd_set readfds, writefds, exceptfds;
+			std::int32_t const rc =
+				netComm.multiplex(readfds, writefds,
+							exceptfds);
+			if (rc < 0)
+			{
+				break;
+			}
+			else if (rc)
+			{
+				netComm.handle(readfds, writefds, exceptfds);
+			}
 		}
 	}
 }

@@ -1,12 +1,14 @@
 #pragma once
 
-#include "net.h"
+#include "api/net.h"
 #include <thread>
 #include <memory>
 #include <atomic>
 
 namespace zia::network 
 {
+	class NetworkComm;
+
 	class NetworkImpl final : public zia::api::Net 
 	{
 	public:
@@ -20,8 +22,7 @@ namespace zia::network
 	private:
 		std::unique_ptr<std::thread>	m_thread = nullptr;
 		std::atomic<bool>		m_running = false;
-		zia::api::Net::Callback		m_respCallback = nullptr;
 
-		void execute() noexcept;
+		void execute(NetworkComm &&) noexcept;
 	};
 }

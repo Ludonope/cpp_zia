@@ -1,5 +1,5 @@
 set(LIB_ZIA_NETWORK zia_network)
-set(ZIA_API_INC "${CMAKE_HOME_DIRECTORY}/sza/api/")
+set(ZIA_API_INC "${CMAKE_HOME_DIRECTORY}/sza/")
 
 file(GLOB LIB_ZIA_NETWORK_SRC ./src/*.cpp)
 file(GLOB LIB_ZIA_NETWORK_HEADERS ./src/*.hpp)
