@@ -4,12 +4,11 @@ namespace zia::network
 {
 	NetworkImpl::NetworkImpl()
 	{
-		// TODO
 	}
 
 	NetworkImpl::~NetworkImpl()
 	{
-		// TODO
+		stop();
 	}
 
 	bool NetworkImpl::config(zia::api::Conf const & conf)
@@ -25,6 +24,7 @@ namespace zia::network
 		}
 		bool	rc = true;
 		try {
+			m_respCallback = cb;
 			m_thread = std::make_unique<std::thread>(
 				[this](){ this->execute(); }
 			);
@@ -39,7 +39,10 @@ namespace zia::network
 
 	bool NetworkImpl::send(zia::api::ImplSocket* sock, zia::api::Net::Raw const & resp)
 	{
-		// TODO
+		if (!m_running || !m_thread) {
+			return false;
+		}
+		// TODO: push to queue and wait for send ?
 		return false;
 	}
 

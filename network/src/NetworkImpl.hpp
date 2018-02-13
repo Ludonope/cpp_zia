@@ -20,6 +20,7 @@ namespace zia::network
 	private:
 		std::unique_ptr<std::thread>	m_thread = nullptr;
 		std::atomic<bool>		m_running = false;
+		zia::api::Net::Callback		m_respCallback = nullptr;
 
 		void execute() noexcept;
 	};
