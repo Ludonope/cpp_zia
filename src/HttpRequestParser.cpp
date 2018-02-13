@@ -32,28 +32,23 @@ namespace zia::http
 
 	static std::string parseUri(RequestLexer &lex)
 	{
-		auto peek = lex.peek().type;
 		std::string uri;
 
 		while (lex && !lex.peekIs({ TokenType::CRLF, TokenType::SPACE }))
 		{
 			uri += lex.next().value;
-			peek = lex.peek().type;
 		}
 
 		return uri;
 	}
 
-	static api::http::Version parseHttpVersion(RequestLexer lex)
+	static api::http::Version parseHttpVersion(RequestLexer &lex)
 	{
-		auto peek = lex.peek().type;
 		std::string version;
 
-		while (peek != TokenType::END_OF_FILE &&
-			peek != TokenType::CRLF && peek != TokenType::SPACE)
+		while (lex && !lex.peekIs({ TokenType::CRLF, TokenType::SPACE }))
 		{
 			version += lex.next().value;
-			peek = lex.peek().type;
 		}
 
 		static const std::array<std::pair<const char *, api::http::Version>, 4> vals{{

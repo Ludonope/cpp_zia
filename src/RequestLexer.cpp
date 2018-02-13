@@ -43,7 +43,7 @@ namespace zia::http
 
 	Token RequestLexer::next()
 	{
-		if (m_cur + 1 < m_tokens.size())
+		if (m_cur < m_tokens.size())
 		{
 			return m_tokens[m_cur++];
 		}
@@ -61,7 +61,6 @@ namespace zia::http
 	Token RequestLexer::nextChecked(std::initializer_list<TokenType> t, std::string msg)
 	{
 		auto token = this->next();
-		bool in = false;
 
 		for (auto type : t)
 		{

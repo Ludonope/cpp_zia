@@ -21,8 +21,8 @@ namespace zia::http
 
 		void lex(std::string_view input);
 
-		Token peek(std::size_t n = 1) const;
-		bool peekIs(std::initializer_list<TokenType> list, std::size_t n = 1);
+		Token peek(std::size_t n = 0) const;
+		bool peekIs(std::initializer_list<TokenType> list, std::size_t n = 0);
 		Token next();
 		Token nextChecked(TokenType t, std::string msg);
 		Token nextChecked(std::initializer_list<TokenType> t, std::string msg);

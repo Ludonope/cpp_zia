@@ -14,11 +14,11 @@ namespace zia::http
 
 			if (std::isalpha(c) || c == '_')
 			{
-				this->parseId();
+				m_tokens.push_back(this->parseId());
 			}
 			else
 			{
-				this->parsePunc();
+				m_tokens.push_back(this->parsePunc());
 			}
 		}
 	}
@@ -32,7 +32,7 @@ namespace zia::http
 		do
 		{
 			++m_cursor;
-			c = m_input[begin];
+			c = m_input[m_cursor];
 		} while (std::isalnum(c) || c == '_');
 
 		return Token(TokenType::ID, m_input.substr(begin, m_cursor - begin));
