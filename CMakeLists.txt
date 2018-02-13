@@ -58,34 +58,14 @@ if (UNIX)
 endif()
 find_package(Sanitizers)
 
+# Build the core
+add_subdirectory(core)
+
+# Build the modules
+add_subdirectory(network)
+
+# Built the tests
 if(UNIX)
 enable_testing()
 add_subdirectory(test)
 endif()
-
-set(LIB_ZIA libzia)
-set(ZIA zia)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-	if (CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(LIB_MSVCRT msvcrt)
-	else()
-		set(LIB_MSVCRT msvcrtd)
-	endif()
-else()
-	set(LIB_MSVCRT)
-endif()
-
-# We compile the project as a static library to make unit testing easier
-file(GLOB LIB_ZIA_SRC ./src/*.cpp)
-file(GLOB LIB_ZIA_HEADERS ./src/*.hpp)
-
-add_library(${LIB_ZIA} ${LIB_ZIA_SRC})
-target_include_directories(${LIB_ZIA} PUBLIC "./src/")
-#add_sanitizers(${LIB_ZIA})
-
-# Build the server
-add_executable(${ZIA} main.cpp)
-target_include_directories(${ZIA} PUBLIC "./src/")
-target_link_libraries(${ZIA} ${LIB_ZIA} ${LIB_MSVCRT})
-#add_sanitizers(${ZIA})
