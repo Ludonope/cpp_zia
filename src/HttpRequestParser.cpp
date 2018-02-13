@@ -5,43 +5,19 @@
 
 namespace zia::http
 {
-	api::HttpRequest parseRequest(std::string_view input)
+	static api::http::Method parseMethod(RequestLexer &lex)
 	{
-		RequestLexer lex(input);
-		api::HttpRequest req;
-
-		req.method = parseMethod(lex);
-		lex.nextChecked(TokenType::SPACE, "Expected a space after the method");
-
-		req.uri = parseUri(lex);
-		lex.nextChecked(TokenType::SPACE, "Expected a space after the uri");
-
-		req.version = parseHttpVersion(lex);
-		lex.nextChecked(TokenType::CRLF, "Expected a CRLF after the http version");
-
-		while (lex && lex.peek().type != TokenType::CRLF)
-		{
-			auto[header, content] = parseHeader(lex);
-
-			req.headers[header] = content;
-			lex.nextChecked(TokenType::CRLF, "Expected a CRLF after a header");
-		}
-		lex.nextChecked(TokenType::CRLF, "Expected a CRLF at the end of the request");
-	}
-
-	api::http::Method parseMethod(RequestLexer &lex)
-	{
-		auto meth = lex.nextChecked(TokenType::ID);
-		static const std::array<std::pair<const char *, api::http::Method>, 8> val{{
+		auto meth = lex.nextChecked(TokenType::ID, "Expected an identifier as a method");
+		static const std::array<std::pair<const char *, api::http::Method>, 8> val{ {
 			{ "OPTIONS", api::http::Method::options },
-			{ "GET", api::http::Method::get },
-			{ "HEAD", api::http::Method::head },
-			{ "POST", api::http::Method::post },
-			{ "PUT", api::http::Method::put },
-			{ "DELETE", api::http::Method::delete_ },
-			{ "TRACE", api::http::Method::trace },
-			{ "CONNECT", api::http::Method::connect }
-		}};
+		{ "GET", api::http::Method::get },
+		{ "HEAD", api::http::Method::head },
+		{ "POST", api::http::Method::post },
+		{ "PUT", api::http::Method::put },
+		{ "DELETE", api::http::Method::delete_ },
+		{ "TRACE", api::http::Method::trace },
+		{ "CONNECT", api::http::Method::connect }
+			} };
 
 		for (auto const &[text, value] : val)
 		{
@@ -54,12 +30,12 @@ namespace zia::http
 		return api::http::Method::unknown;
 	}
 
-	std::string parseUri(RequestLexer &lex)
+	static std::string parseUri(RequestLexer &lex)
 	{
 		auto peek = lex.peek().type;
 		std::string uri;
 
-		while (lex && !lex.peekIs({TokenType::CRLF, TokenType::SPACE}))
+		while (lex && !lex.peekIs({ TokenType::CRLF, TokenType::SPACE }))
 		{
 			uri += lex.next().value;
 			peek = lex.peek().type;
@@ -68,7 +44,7 @@ namespace zia::http
 		return uri;
 	}
 
-	api::http::Version parseHttpVersion(RequestLexer lex)
+	static api::http::Version parseHttpVersion(RequestLexer lex)
 	{
 		auto peek = lex.peek().type;
 		std::string version;
@@ -98,7 +74,7 @@ namespace zia::http
 		return api::http::Version::unknown;
 	}
 
-	std::pair<std::string, std::string> parseHeader(RequestLexer &lex)
+	static std::pair<std::string, std::string> parseHeader(RequestLexer &lex)
 	{
 		std::string header;
 		auto peek = lex.peek().type;
@@ -123,5 +99,31 @@ namespace zia::http
 		}
 
 		return { header, content };
+	}
+
+	api::HttpRequest parseRequest(std::string_view input)
+	{
+		RequestLexer lex(input);
+		api::HttpRequest req;
+
+		req.method = parseMethod(lex);
+		lex.nextChecked(TokenType::SPACE, "Expected a space after the method");
+
+		req.uri = parseUri(lex);
+		lex.nextChecked(TokenType::SPACE, "Expected a space after the uri");
+
+		req.version = parseHttpVersion(lex);
+		lex.nextChecked(TokenType::CRLF, "Expected a CRLF after the http version");
+
+		while (lex && lex.peek().type != TokenType::CRLF)
+		{
+			auto[header, content] = parseHeader(lex);
+
+			req.headers[header] = content;
+			lex.nextChecked(TokenType::CRLF, "Expected a CRLF after a header");
+		}
+		lex.nextChecked(TokenType::CRLF, "Expected a CRLF at the end of the request");
+
+		return req;
 	}
 }

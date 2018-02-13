@@ -33,7 +33,7 @@ namespace zia::http
 		{
 			++m_cursor;
 			c = m_input[begin];
-		} while (std::isalnum(c) || c == '_')
+		} while (std::isalnum(c) || c == '_');
 
 		return Token(TokenType::ID, m_input.substr(begin, m_cursor - begin));
 	}

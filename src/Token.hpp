@@ -46,8 +46,9 @@ namespace zia::http
 
 		TokenType type;
 		std::string_view value;
-		std::vector<Token> childs;
+		std::vector<Token> childs = {};
 
-		static const Token eof = Token(TokenType::END_OF_FILE);
+		static const Token eof;
+		static const Token unknown;
 	};
 }
