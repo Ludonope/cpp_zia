@@ -72,7 +72,7 @@ namespace zia::network
 			std::size_t bodySize = 0;
 			http::parseRequest(&datas[0], bodySize);
 			auto const totalSize = headerLength + bodySize;
-			request.reserve(totalSize);
+			request.resize(totalSize, {});
 			this->read(&request[0], totalSize);
 			return request;
 		}
@@ -95,7 +95,7 @@ namespace zia::network
 					data = RingBuffer::operator[](ndx + 2);
 					dataNext = RingBuffer::operator[](ndx + 3);
 					if (data == carriageReturn && dataNext == lineFeed) {
-						return ndx + 3;
+						return ndx + 3 + 1; // Add one for the length of the string
 					}
 				}
 				++ndx;
