@@ -49,12 +49,12 @@ namespace zia::network
 			}
 			try
 			{
-				//std::size_t contentLength = 0;
-				//parseRequest(, contentLength);
-				// TODO
-				// get Content-Length (fonction de Ludo)
-				// if remainingBufferSize >= length, return true
-				// else return false
+				std::size_t contentLength = 0;
+				std::size_t remainingSize = 0;
+				// Datas is guaranted to contain at a double CRLF
+				auto const datas = this->peek();
+				http::parseRequest(&datas[0], contentLength);
+				rc = (remainingSize >= contentLength);
 			}
 			catch (std::exception const &)
 			{
@@ -68,10 +68,12 @@ namespace zia::network
 			api::Net::Raw request;
 			assert(hasRequest());
 			auto const headerLength = getHeaderLength();
-			auto const bodySize = 0; // TODO: Appeler la fonction de ludo
-
-			request.reserve(headerLength + bodySize);
-			// TODO: read and fill
+			auto const datas = this->peek();
+			std::size_t bodySize = 0;
+			http::parseRequest(&datas[0], bodySize);
+			auto const totalSize = headerLength + bodySize;
+			request.reserve(totalSize);
+			this->read(&request[0], totalSize);
 			return request;
 		}
 
@@ -79,9 +81,7 @@ namespace zia::network
 		{
 			auto const carriageReturn = std::byte{0x0D};
 			auto const lineFeed = std::byte{0x0A};
-			std::size_t const max =
-				(m_ndxWrite > m_ndxRead) ? m_ndxRead :
-					(detail::HTTP_BUFFER_SIZE - (m_ndxRead - m_ndxWrite));
+			std::size_t const max = this->getAvailableData();
 			assert(max < detail::HTTP_BUFFER_SIZE);
 			auto ndx = m_ndxRead;
 

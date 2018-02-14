@@ -58,6 +58,7 @@ namespace zia
 			return m_data[ndx % S];
 		}
 
+		// Write datas to the buffer
 		void write(std::byte const *data, std::size_t const len) noexcept
 		{
 			if (data)
@@ -74,6 +75,7 @@ namespace zia
 			}
 		}
 
+		// Read datas from the buffer, and update indexes
 		void read(std::byte *data, std::size_t const len) noexcept
 		{
 			if (data)
@@ -85,10 +87,34 @@ namespace zia
 						m_ndxRead = 0;
 					}
 					data[i] = m_data[m_ndxRead];
-					m_data[m_ndxRead] = '\0';
+					m_data[m_ndxRead] = std::byte{'\0'};
 					++m_ndxRead;
 				}
 			}
+		}
+
+		// Get differences of byte between read cursor and write cursor (a.k.a: available datas)
+		inline std::size_t getAvailableData() const noexcept
+		{
+			return (m_ndxWrite > m_ndxRead) ? m_ndxRead :
+				(S - (m_ndxRead - m_ndxWrite));
+		}
+
+		// Get all the "available data" (see above), without modifying the indexes
+		std::vector<std::byte> peek() const noexcept
+		{
+			auto datas = std::vector<std::byte>();
+			auto const remainingSize = getAvailableData();
+			for (std::size_t i = 0, ndx = m_ndxRead;
+				i < remainingSize; ++i, ++ndx)
+			{
+				if (ndx == S)
+				{
+					ndx = 0;
+				}
+				datas.push_back(m_data[ndx]);
+			}
+			return datas;
 		}
 
 	protected:
