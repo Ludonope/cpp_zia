@@ -146,4 +146,30 @@ namespace zia::http
 
 		return req;
 	}
+
+	static std::string_view getHeader(std::byte const *raw)
+	{
+		auto input = reinterpret_cast<char const *>(raw);
+		std::size_t size = 0;
+
+		// Loop until we hit the double CRLF
+		while (std::strncmp(&input[size], "\r\n\r\n", 4))
+		{
+			++size;
+		}
+
+		size += 4;
+
+		return std::string_view(input, size);
+	}
+
+	api::HttpRequest parseRequest(std::byte const *raw)
+	{
+		return parseRequest(getHeader(raw));
+	}
+
+	api::HttpRequest parseRequest(std::byte const *raw, std::size_t &bodyLen)
+	{
+		return parseRequest(getHeader(raw), bodyLen);
+	}
 }
