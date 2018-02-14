@@ -34,29 +34,7 @@ namespace zia::network
 
 		bool HttpRingBuffer::hasHeader() const noexcept
 		{
-			auto const carriageReturn = std::byte{0x0D};
-			auto const lineFeed = std::byte{0x0A};
-			std::size_t const max =
-				(m_ndxWrite > m_ndxRead) ? m_ndxRead : (detail::HTTP_BUFFER_SIZE - m_ndxWrite);
-			assert(max < detail::HTTP_BUFFER_SIZE);
-			auto ndx = m_ndxRead;
-
-			while (ndx < max)
-			{
-				auto data = RingBuffer::operator[](ndx);
-				auto dataNext = RingBuffer::operator[](ndx + 1);
-				if (data == carriageReturn && (ndx + 3 < max) &&
-					dataNext == lineFeed)
-				{
-					data = RingBuffer::operator[](ndx + 2);
-					dataNext = RingBuffer::operator[](ndx + 3);
-					if (data == carriageReturn && dataNext == lineFeed) {
-						return true;
-					}
-				}
-				++ndx;
-			}
-			return false;
+			return getHeaderLength() != 0;
 		}
 
 		bool HttpRingBuffer::hasRequest() const noexcept
@@ -73,6 +51,35 @@ namespace zia::network
 
 		api::Net::Raw HttpRingBuffer::getRequest() noexcept
 		{
+			assert(hasRequest());
 			// TODO
+		}
+
+		std::size_t getHeaderLength() const noexcept
+		{
+			auto const carriageReturn = std::byte{0x0D};
+			auto const lineFeed = std::byte{0x0A};
+			std::size_t const max =
+				(m_ndxWrite > m_ndxRead) ? m_ndxRead :
+					(detail::HTTP_BUFFER_SIZE - (m_ndxRead - m_ndxWrite));
+			assert(max < detail::HTTP_BUFFER_SIZE);
+			auto ndx = m_ndxRead;
+
+			while (ndx < max)
+			{
+				auto data = RingBuffer::operator[](ndx);
+				auto dataNext = RingBuffer::operator[](ndx + 1);
+				if (data == carriageReturn && (ndx + 3 < max) &&
+					dataNext == lineFeed)
+				{
+					data = RingBuffer::operator[](ndx + 2);
+					dataNext = RingBuffer::operator[](ndx + 3);
+					if (data == carriageReturn && dataNext == lineFeed) {
+						return ndx + 3;
+					}
+				}
+				++ndx;
+			}
+			return 0;
 		}
 }

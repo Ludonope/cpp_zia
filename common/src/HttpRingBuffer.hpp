@@ -23,5 +23,8 @@ namespace zia::network
 		bool hasHeader() const noexcept;
 		bool hasRequest() const noexcept;
 		api::Net::Raw getRequest() noexcept;
+
+	private:
+		std::size_t getHeaderLength() const noexcept;
 	};
 }
