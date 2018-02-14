@@ -56,6 +56,7 @@ if (UNIX)
 	hunter_add_package(GTest)
 	hunter_add_package(benchmark)
 endif()
+hunter_add_package(OpenSSL)
 find_package(Sanitizers)
 enable_testing()
 
@@ -67,3 +68,4 @@ add_subdirectory(core)
 
 # Build the modules
 add_subdirectory(network)
+add_subdirectory(network_ssl)
