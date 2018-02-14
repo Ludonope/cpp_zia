@@ -1,9 +1,8 @@
 #if defined(_WIN32)
 # include <io.h>
+# include <BaseTsd.h>
 # define read _read
 # define write _write
-# include <BaseTsd.h>
-using ssize_t = SSIZE_T;
 #endif
 
 #include <string>
