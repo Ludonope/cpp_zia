@@ -1,0 +1,26 @@
+#pragma once
+
+#include "api/net.h"
+#include "RingBuffer.hpp"
+
+namespace zia::network
+{
+	namespace detail
+	{
+		static constexpr auto const HTTP_BUFFER_SIZE = 0x1000;
+	}
+
+	class HttpRingBuffer final : public RingBuffer<detail::HTTP_BUFFER_SIZE>
+	{
+	public:
+		HttpRingBuffer() noexcept;
+		~HttpRingBuffer() = default;
+		HttpRingBuffer(HttpRingBuffer const &other);
+		HttpRingBuffer(HttpRingBuffer &&other);
+		HttpRingBuffer &operator=(HttpRingBuffer const &);
+		HttpRingBuffer &operator=(HttpRingBuffer &&);
+
+		bool hasRequest() const noexcept;
+		api::Net::Raw getRequest() noexcept;
+	};
+}

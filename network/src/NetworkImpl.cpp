@@ -1,8 +1,9 @@
 #include "NetworkImpl.hpp"
+#include "NetworkComm.hpp"
 
 namespace zia::network 
 {
-	NetworkImpl::NetworkImpl()
+	NetworkImpl::NetworkImpl() : m_toSend()
 	{
 	}
 
@@ -24,9 +25,9 @@ namespace zia::network
 		}
 		bool	rc = true;
 		try {
-			m_respCallback = cb;
+			NetworkComm netComm(std::move(cb), 4242); // TODO: pass config port
 			m_thread = std::make_unique<std::thread>(
-				[this](){ this->execute(); }
+				[&](){ this->execute(std::move(netComm)); }
 			);
 			m_running = true;
 		}
@@ -37,13 +38,13 @@ namespace zia::network
 		return rc;
 	}
 
-	bool NetworkImpl::send(zia::api::ImplSocket* sock, zia::api::Net::Raw const & resp)
+	bool NetworkImpl::send(api::ImplSocket* sock, api::Net::Raw const & resp)
 	{
 		if (!m_running || !m_thread) {
 			return false;
 		}
-		// TODO: push to queue and wait for send ?
-		return false;
+		m_toSend.push({sock, resp});
+		return true;
 	}
 
 	bool NetworkImpl::stop()
@@ -59,11 +60,28 @@ namespace zia::network
 		return true;
 	}
 
-	void NetworkImpl::execute() noexcept
+	void NetworkImpl::execute(NetworkComm &&netComm) noexcept
 	{
 		while (m_running)
 		{
+			while (!m_toSend.empty())
+			{
+				auto [sock, data] = m_toSend.pop();
+				netComm.send(sock, std::move(data));
+			}
 
+			fd_set readfds, writefds, exceptfds;
+			std::int32_t const rc =
+				netComm.multiplex(readfds, writefds,
+							exceptfds);
+			if (rc < 0)
+			{
+				break;
+			}
+			else if (rc)
+			{
+				netComm.handle(readfds, writefds, exceptfds);
+			}
 		}
 	}
 }

@@ -1,27 +1,31 @@
 #pragma once
 
-#include "net.h"
+#include "api/net.h"
+#include "TSQueue.hpp"
 #include <thread>
 #include <memory>
 #include <atomic>
 
 namespace zia::network 
 {
-	class NetworkImpl final : public zia::api::Net 
+	class NetworkComm;
+
+	class NetworkImpl final : public api::Net 
 	{
 	public:
 		NetworkImpl();
 		virtual ~NetworkImpl();
-		bool config(zia::api::Conf const & conf) override;
-		bool run(zia::api::Net::Callback cb) override;
-		bool send(zia::api::ImplSocket* sock, zia::api::Net::Raw const & resp) override;
+		bool config(api::Conf const & conf) override;
+		bool run(api::Net::Callback cb) override;
+		bool send(api::ImplSocket* sock, api::Net::Raw const & resp) override;
 		bool stop() override;
 
 	private:
+		using ClientMsg = std::pair<api::ImplSocket *, api::Net::Raw>;
 		std::unique_ptr<std::thread>	m_thread = nullptr;
 		std::atomic<bool>		m_running = false;
-		zia::api::Net::Callback		m_respCallback = nullptr;
+		TSQueue<ClientMsg>		m_toSend;
 
-		void execute() noexcept;
+		void execute(NetworkComm &&) noexcept;
 	};
 }
