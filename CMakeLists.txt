@@ -2,13 +2,11 @@
 cmake_minimum_required(VERSION 3.7)
 
 # Add Hunter packet manager
-if(UNIX)
 include("cmake_modules/HunterGate.cmake")
 HunterGate(
     URL "https://github.com/ruslo/hunter/archive/v0.19.192.tar.gz"
     SHA1 "820996fcbb96b07684955e053d2be3eee8538183"
 )
-endif()
 
 project(cpp_rtype)
 if(NOT CMAKE_BUILD_TYPE)
@@ -17,6 +15,15 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 # Location of additional cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+
+set(HUNTER_STATUS_DEBUG ON)
+
+if (UNIX)
+	# Get dependencies
+	hunter_add_package(GTest)
+	hunter_add_package(benchmark)
+	find_package(Sanitizers)
+endif()
 
 # C++ rules
 if((CMAKE_CXX_COMPILER_ID MATCHES GNU) OR (CMAKE_CXX_COMPILER_ID MATCHES Clang))
@@ -51,41 +58,12 @@ if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
     SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_CXX_COVERAGE_LINK_FLAGS}")
 endif()
 
-# Get dependencies
-if (UNIX)
-	hunter_add_package(GTest)
-	hunter_add_package(benchmark)
-endif()
-find_package(Sanitizers)
+# Build the core
+add_subdirectory(core)
 
-if(UNIX)
+# Build the modules
+add_subdirectory(network)
+
+# Built the tests
 enable_testing()
 add_subdirectory(test)
-endif()
-
-set(LIB_ZIA libzia)
-set(ZIA zia)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-	if (CMAKE_BUILD_TYPE MATCHES DEBUG)
-		set(LIB_MSVCRT msvcrt)
-	else()
-		set(LIB_MSVCRT msvcrtd)
-	endif()
-else()
-	set(LIB_MSVCRT)
-endif()
-
-# We compile the project as a static library to make unit testing easier
-file(GLOB LIB_ZIA_SRC ./src/*.cpp)
-file(GLOB LIB_ZIA_HEADERS ./src/*.hpp)
-
-add_library(${LIB_ZIA} ${LIB_ZIA_SRC})
-target_include_directories(${LIB_ZIA} PUBLIC "./src/" "./sza/")
-#add_sanitizers(${LIB_ZIA})
-
-# Build the server
-add_executable(${ZIA} main.cpp)
-target_include_directories(${ZIA} PUBLIC "./src/" "./sza/")
-target_link_libraries(${ZIA} ${LIB_ZIA} ${LIB_MSVCRT})
-#add_sanitizers(${ZIA})
