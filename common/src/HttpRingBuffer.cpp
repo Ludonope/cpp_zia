@@ -56,7 +56,7 @@ namespace zia::network
 				http::parseRequest(&datas[0], contentLength);
 				rc = (remainingSize >= contentLength);
 			}
-			catch (std::exception const &e)
+			catch (std::exception const &)
 			{
 				rc = false;
 			}
