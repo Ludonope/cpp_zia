@@ -1,4 +1,5 @@
-#include <exception>
+#include <stdexcept>
+#include <string>
 #include "RequestLexer.hpp"
 #include "Tokenizer.hpp"
 

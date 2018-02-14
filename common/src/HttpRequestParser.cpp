@@ -1,6 +1,7 @@
 #include <array>
 #include <utility>
 #include <string>
+#include <cstring>
 #include "HttpRequestParser.hpp"
 #include "RequestLexer.hpp"
 

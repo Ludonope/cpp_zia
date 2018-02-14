@@ -2,6 +2,7 @@
 #include <utility>
 #include <array>
 #include <exception>
+#include <cstring>
 #include "Tokenizer.hpp"
 
 namespace zia::http

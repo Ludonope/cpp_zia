@@ -1,5 +1,6 @@
 #include <cassert>
 #include "HttpRingBuffer.hpp"
+#include "HttpRequestParser.hpp"
 
 namespace zia::network
 {
@@ -39,14 +40,27 @@ namespace zia::network
 
 		bool HttpRingBuffer::hasRequest() const noexcept
 		{
-			if (!hasHeader())
+			auto const headerLength = getHeaderLength();
+			auto rc = true;
+
+			if (headerLength == 0)
 			{
 				return false;
 			}
-			// TODO
-			// get Content-Length
-			// if remainingBufferSize >= length, return true
-			// else return false
+			try
+			{
+				//std::size_t contentLength = 0;
+				//parseRequest(, contentLength);
+				// TODO
+				// get Content-Length (fonction de Ludo)
+				// if remainingBufferSize >= length, return true
+				// else return false
+			}
+			catch (std::exception const &e)
+			{
+				rc = false;
+			}
+			return rc;
 		}
 
 		api::Net::Raw HttpRingBuffer::getRequest() noexcept
@@ -54,7 +68,7 @@ namespace zia::network
 			api::Net::Raw request;
 			assert(hasRequest());
 			auto const headerLength = getHeaderLength();
-			auto const bodySize = 0; // TODO
+			auto const bodySize = 0; // TODO: Appeler la fonction de ludo
 
 			request.reserve(headerLength + bodySize);
 			// TODO: read and fill
