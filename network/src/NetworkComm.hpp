@@ -39,6 +39,13 @@ namespace zia::network {
 		sockaddr_in_t				m_sockAddr = {};
 		std::vector<std::unique_ptr<Client>>	m_clients;
 
+#if defined(_WIN32)
+		static std::uint32_t	m_nbSockets;
+		static bool		m_WSAInited;
+		void initWindows() const;
+		void deinitWindows() const noexcept;
+#endif
+
 		void acceptClient();
 	};
 }

@@ -1,14 +1,23 @@
+#include <cassert>
 #include <algorithm>
 #include <stdexcept>
 #include "NetworkComm.hpp"
 
 namespace zia::network
 {
+#if defined(_WIN32)
+	std::uint32_t	NetworkComm::m_nbSockets = 0;
+	bool		NetworkComm::m_WSAInited = false;
+#endif
+
 	NetworkComm::NetworkComm(zia::api::Net::Callback &&cb,
 				std::uint16_t const port) :
 		m_respCallback(std::move(cb)),
 		m_port(port), m_clients{}
 	{
+#if defined(_WIN32)
+		initWindows();
+#endif
 		m_socket = ::socket(AF_INET, SOCK_STREAM, 0);
 		if (m_socket == -1)
 		{
@@ -36,6 +45,9 @@ namespace zia::network
 			closesocket(m_socket);
 			m_socket = -1;
 		}
+#if defined(_WIN32)
+	deinitWindows();
+#endif
 	}
 
 	NetworkComm::NetworkComm(NetworkComm &&other) :
@@ -168,4 +180,36 @@ namespace zia::network
 			m_clients.push_back(std::make_unique<Client>(rc, sockAddr));
 		}
 	}
+
+#if defined _WIN32
+	void NetworkComm::initWindows() const
+	{
+		if (!m_nbSockets && !m_WSAInited)
+		{
+			WSADATA wsa;
+
+			assert(m_WSAInited == false);
+			if (WSAStartup(MAKEWORD(2, 2), &wsa) < 0)
+			{
+				throw std::runtime_error("Cannot load network DLL");
+			}
+			m_WSAInited = true;
+		}
+		++m_nbSockets;
+	}
+
+	void NetworkComm::deinitWindows() const noexcept
+	{
+		if (m_socket != -1)
+		{
+			--m_nbSockets;
+			if (!m_nbSockets)
+			{
+				assert(m_WSAInited == true);
+				WSACleanup();
+				m_WSAInited = false;
+			}
+		}
+	}
+#endif
 }
