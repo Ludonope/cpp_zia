@@ -2,13 +2,11 @@
 cmake_minimum_required(VERSION 3.7)
 
 # Add Hunter packet manager
-if(UNIX)
 include("cmake_modules/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/ruslo/hunter/archive/v0.19.192.tar.gz"
-    SHA1 "820996fcbb96b07684955e053d2be3eee8538183"
+	URL "https://github.com/ruslo/hunter/archive/v0.19.192.tar.gz"
+	SHA1 "820996fcbb96b07684955e053d2be3eee8538183"
 )
-endif()
 
 project(cpp_rtype)
 if(NOT CMAKE_BUILD_TYPE)

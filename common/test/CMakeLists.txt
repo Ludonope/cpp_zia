@@ -1,7 +1,7 @@
 if (UNIX)
-	find_package(benchmark CONFIG REQUIRED)
+	# find_package(benchmark CONFIG REQUIRED)
 	find_package(GTest CONFIG REQUIRED)
-	find_package(GMock CONFIG REQUIRED)
+	# find_package(GMock CONFIG REQUIRED)
 
 	# Set for each "series" of test
 	set(TEST_PREFIX common)

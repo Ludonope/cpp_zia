@@ -1,0 +1,82 @@
+{
+  "configurations": [
+    {
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "name": "x86-Debug",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+      ],
+      "defines": [
+        "WIN32",
+        "DEBUG",
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "compilerSwitches": "/std:c++17 /Od",
+      "intelliSenseMode": "windows-msvc-x86"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "name": "x86-Release",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+      ],
+      "defines": [
+        "WIN32",
+        "NDEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "compilerSwitches": "/std:c++17 /Ox",
+      "intelliSenseMode": "windows-msvc-x86"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "name": "x64-Debug",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+      ],
+      "defines": [
+        "WIN32",
+        "DEBUG",
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "compilerSwitches": "/std:c++17 /Od",
+      "intelliSenseMode": "windows-msvc-x64"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "name": "x64-Release",
+      "includePath": [
+        "${env.INCLUDE}",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+      ],
+      "defines": [
+        "WIN32",
+        "NDEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "compilerSwitches": "/std:c++17 /Ox",
+      "intelliSenseMode": "windows-msvc-x64"
+    }
+  ]
+}
