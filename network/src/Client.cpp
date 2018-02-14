@@ -69,8 +69,19 @@ namespace zia::network
 
 	bool Client::handleInput() noexcept
 	{
-		// TODO
-		return false;
+		auto const sock = m_implSocket.sock;
+		ssize_t rc = 0;
+		std::array<std::byte, detail::HTTP_BUFFER_SIZE> buffer = {};
+
+		do
+		{
+			rc = read(sock, buffer.data(), sizeof(buffer) - 1);
+		} while (rc == -1 && errno == EINTR);
+		if (rc <= 0) {
+			return false;
+		}
+		m_buffer.write(buffer.data(), rc);
+		return true;
 	}
 
 	bool Client::handleOutput() noexcept

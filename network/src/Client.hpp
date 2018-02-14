@@ -3,6 +3,7 @@
 #include "api/net.h"
 #include "Network.hpp"
 #include "ImplSocket.hpp"
+#include "HttpRingBuffer.hpp"
 #include <queue>
 
 namespace zia::network {
@@ -38,7 +39,15 @@ namespace zia::network {
 			return m_infos;
 		}
 
-		zia::api::Net::Raw const &getRaw() const noexcept;
+		inline bool hasRequest() const noexcept
+		{
+			return m_buffer.hasRequest();
+		}
+
+		inline zia::api::Net::Raw getRaw() noexcept
+		{
+			return m_buffer.getRequest();
+		}
 
 		bool handleInput() noexcept;
 		bool handleOutput() noexcept;
@@ -52,5 +61,6 @@ namespace zia::network {
 		zia::api::ImplSocket		m_implSocket;
 		zia::api::NetInfo		m_infos;
 		std::queue<api::Net::Raw>	m_toSend;
+		HttpRingBuffer			m_buffer;
 	};
 }

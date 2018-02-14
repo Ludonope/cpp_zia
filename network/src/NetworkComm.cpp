@@ -116,7 +116,7 @@ namespace zia::network
 			if (FD_ISSET(sock, &writefds))
 			{
 				mustDelete = !((*ite)->handleOutput());
-				if (!mustDelete) {
+				if (!mustDelete && (*ite)->hasRequest()) {
 					auto const &raw = (*ite)->getRaw();
 					auto const &infos = (*ite)->getInfos();
 

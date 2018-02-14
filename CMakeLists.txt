@@ -57,15 +57,13 @@ if (UNIX)
 	hunter_add_package(benchmark)
 endif()
 find_package(Sanitizers)
+enable_testing()
+
+# Build static libraries
+add_subdirectory(common)
 
 # Build the core
 add_subdirectory(core)
 
 # Build the modules
 add_subdirectory(network)
-
-# Built the tests
-if(UNIX)
-enable_testing()
-add_subdirectory(test)
-endif()
