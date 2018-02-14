@@ -51,11 +51,17 @@ namespace zia::network
 
 		api::Net::Raw HttpRingBuffer::getRequest() noexcept
 		{
+			api::Net::Raw request;
 			assert(hasRequest());
-			// TODO
+			auto const headerLength = getHeaderLength();
+			auto const bodySize = 0; // TODO
+
+			request.reserve(headerLength + bodySize);
+			// TODO: read and fill
+			return request;
 		}
 
-		std::size_t getHeaderLength() const noexcept
+		std::size_t HttpRingBuffer::getHeaderLength() const noexcept
 		{
 			auto const carriageReturn = std::byte{0x0D};
 			auto const lineFeed = std::byte{0x0A};
