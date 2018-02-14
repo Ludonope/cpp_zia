@@ -46,7 +46,7 @@ namespace zia::network
 			m_socket = -1;
 		}
 #if defined(_WIN32)
-	deinitWindows();
+		deinitWindows();
 #endif
 	}
 

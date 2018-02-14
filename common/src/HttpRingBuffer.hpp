@@ -7,7 +7,7 @@ namespace zia::network
 {
 	namespace detail
 	{
-		static constexpr auto const HTTP_BUFFER_SIZE = 0x1000;
+		static constexpr auto HTTP_BUFFER_SIZE = 0x1000;
 	}
 
 	class HttpRingBuffer final : public RingBuffer<detail::HTTP_BUFFER_SIZE>
@@ -20,6 +20,7 @@ namespace zia::network
 		HttpRingBuffer &operator=(HttpRingBuffer const &);
 		HttpRingBuffer &operator=(HttpRingBuffer &&);
 
+		bool hasHeader() const noexcept;
 		bool hasRequest() const noexcept;
 		api::Net::Raw getRequest() noexcept;
 	};

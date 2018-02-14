@@ -53,6 +53,11 @@ namespace zia
 			return *this;
 		}
 
+		std::byte	operator[](std::size_t const ndx) const
+		{
+			return m_data[ndx % S];
+		}
+
 		void write(std::byte const *data, std::size_t const len) noexcept
 		{
 			if (data)

@@ -15,6 +15,7 @@ namespace zia::network
 	bool NetworkImpl::config(zia::api::Conf const & conf)
 	{
 		// TODO
+		m_port = 4242;
 		return false;
 	}
 
@@ -25,7 +26,7 @@ namespace zia::network
 		}
 		bool	rc = true;
 		try {
-			NetworkComm netComm(std::move(cb), 4242); // TODO: pass config port
+			NetworkComm netComm(std::move(cb), m_port);
 			m_thread = std::make_unique<std::thread>(
 				[&](){ this->execute(std::move(netComm)); }
 			);
@@ -71,7 +72,7 @@ namespace zia::network
 			}
 
 			fd_set readfds, writefds, exceptfds;
-			std::int32_t const rc =
+			auto const rc =
 				netComm.multiplex(readfds, writefds,
 							exceptfds);
 			if (rc < 0)

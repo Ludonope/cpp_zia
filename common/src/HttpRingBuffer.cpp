@@ -1,3 +1,4 @@
+#include <cassert>
 #include "HttpRingBuffer.hpp"
 
 namespace zia::network
@@ -31,9 +32,43 @@ namespace zia::network
 			return *this;
 		}
 
+		bool HttpRingBuffer::hasHeader() const noexcept
+		{
+			auto const carriageReturn = std::byte{0x0D};
+			auto const lineFeed = std::byte{0x0A};
+			std::size_t const max =
+				(m_ndxWrite > m_ndxRead) ? m_ndxRead : (detail::HTTP_BUFFER_SIZE - m_ndxWrite);
+			assert(max < detail::HTTP_BUFFER_SIZE);
+			auto ndx = m_ndxRead;
+
+			while (ndx < max)
+			{
+				auto data = RingBuffer::operator[](ndx);
+				auto dataNext = RingBuffer::operator[](ndx + 1);
+				if (data == carriageReturn && (ndx + 3 < max) &&
+					dataNext == lineFeed)
+				{
+					data = RingBuffer::operator[](ndx + 2);
+					dataNext = RingBuffer::operator[](ndx + 3);
+					if (data == carriageReturn && dataNext == lineFeed) {
+						return true;
+					}
+				}
+				++ndx;
+			}
+			return false;
+		}
+
 		bool HttpRingBuffer::hasRequest() const noexcept
 		{
+			if (!hasHeader())
+			{
+				return false;
+			}
 			// TODO
+			// get Content-Length
+			// if remainingBufferSize >= length, return true
+			// else return false
 		}
 
 		api::Net::Raw HttpRingBuffer::getRequest() noexcept
