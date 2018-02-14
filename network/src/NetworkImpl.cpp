@@ -3,7 +3,7 @@
 
 namespace zia::network 
 {
-	NetworkImpl::NetworkImpl()
+	NetworkImpl::NetworkImpl() : m_toSend()
 	{
 	}
 
@@ -38,13 +38,13 @@ namespace zia::network
 		return rc;
 	}
 
-	bool NetworkImpl::send(zia::api::ImplSocket* sock, zia::api::Net::Raw const & resp)
+	bool NetworkImpl::send(api::ImplSocket* sock, api::Net::Raw const & resp)
 	{
 		if (!m_running || !m_thread) {
 			return false;
 		}
-		// TODO: push to queue and wait for send ?
-		return false;
+		m_toSend.push({sock, resp});
+		return true;
 	}
 
 	bool NetworkImpl::stop()
@@ -64,6 +64,12 @@ namespace zia::network
 	{
 		while (m_running)
 		{
+			while (!m_toSend.empty())
+			{
+				auto [sock, data] = m_toSend.pop();
+				netComm.send(sock, std::move(data));
+			}
+
 			fd_set readfds, writefds, exceptfds;
 			std::int32_t const rc =
 				netComm.multiplex(readfds, writefds,

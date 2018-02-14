@@ -3,6 +3,7 @@
 #include "api/net.h"
 #include "Network.hpp"
 #include "ImplSocket.hpp"
+#include <queue>
 
 namespace zia::network {
 	class Client final
@@ -16,12 +17,21 @@ namespace zia::network {
 		Client &operator=(Client const &);
 		Client &operator=(Client &&);
 
-		bool canWrite() const noexcept;
-		sock_t getSocket() const noexcept
+		inline bool canWrite() const noexcept
+		{
+			return !m_toSend.empty();
+		}
+
+		inline sock_t getSocket() const noexcept
 		{
 			return m_implSocket.sock;
 		}
-		bool hasTimedOut() const noexcept;
+
+		inline bool hasTimedOut() const noexcept
+		{
+			// TODO
+			return false;
+		}
 
 		inline zia::api::NetInfo const &getInfos() const noexcept
 		{
@@ -31,10 +41,16 @@ namespace zia::network {
 		zia::api::Net::Raw const &getRaw() const noexcept;
 
 		bool handleInput() noexcept;
-		bool handleOutput() const noexcept;
+		bool handleOutput() noexcept;
+
+		inline void send(api::Net::Raw &&data)
+		{
+			m_toSend.push(std::move(data));
+		}
 
 	private:
-		zia::api::ImplSocket	m_implSocket;
-		zia::api::NetInfo	m_infos;
+		zia::api::ImplSocket		m_implSocket;
+		zia::api::NetInfo		m_infos;
+		std::queue<api::Net::Raw>	m_toSend;
 	};
 }

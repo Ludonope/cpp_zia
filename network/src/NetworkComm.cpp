@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <stdexcept>
 #include "NetworkComm.hpp"
 
@@ -136,6 +137,18 @@ namespace zia::network
 			{
 				++ite;
 			}
+		}
+	}
+
+	void NetworkComm::send(api::ImplSocket *sock, api::Net::Raw &&data) noexcept
+	{
+		auto ite = std::find_if(std::begin(m_clients), std::end(m_clients),
+			[&](auto const &o) {
+			return (*o).getInfos().sock == sock;
+		});
+		if (ite != std::end(m_clients))
+		{
+			(*ite)->send(std::move(data));
 		}
 	}
 

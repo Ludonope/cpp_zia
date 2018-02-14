@@ -24,6 +24,7 @@ namespace zia::network {
 		NetworkComm(NetworkComm &&);
 		NetworkComm &operator=(NetworkComm &&);
 
+		void send(api::ImplSocket *, api::Net::Raw &&) noexcept;
 		std::int32_t multiplex(fd_set &readfds,
 				fd_set &writefds,
 				fd_set &exceptfds) const noexcept;
@@ -32,7 +33,7 @@ namespace zia::network {
 				fd_set const &exceptfds);
 
 	private:
-		zia::api::Net::Callback			m_respCallback = nullptr;
+		api::Net::Callback			m_respCallback = nullptr;
 		std::uint16_t				m_port;
 		sock_t					m_socket = -1;
 		sockaddr_in_t				m_sockAddr = {};

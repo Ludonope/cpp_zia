@@ -27,14 +27,16 @@ namespace zia::network
 
 	Client::Client(Client const &other) :
 		m_implSocket(other.m_implSocket),
-		m_infos(other.m_infos)
+		m_infos(other.m_infos),
+		m_toSend(other.m_toSend)
 	{
 		m_infos.sock = &m_implSocket;
 	}
 
 	Client::Client(Client &&other) :
 		m_implSocket(std::move(other.m_implSocket)),
-		m_infos(std::move(other.m_infos))
+		m_infos(std::move(other.m_infos)),
+		m_toSend(std::move(other.m_toSend))
 	{
 		m_infos.sock = &m_implSocket;
 		other.m_implSocket.sock = -1;
@@ -47,6 +49,7 @@ namespace zia::network
 			m_implSocket = other.m_implSocket;
 			m_infos = other.m_infos;
 			m_infos.sock = &m_implSocket;
+			m_toSend = other.m_toSend;
 		}
 		return *this;
 	}
@@ -59,6 +62,7 @@ namespace zia::network
 			m_infos = std::move(other.m_infos);
 			m_infos.sock = &m_implSocket;
 			other.m_implSocket.sock = -1;
+			m_toSend = std::move(other.m_toSend);
 		}
 		return *this;
 	}
@@ -69,9 +73,28 @@ namespace zia::network
 		return false;
 	}
 
-	bool Client::handleOutput() const noexcept
+	bool Client::handleOutput() noexcept
 	{
-		// TODO
-		return false;
+		auto const sock = m_implSocket.sock;
+		auto const data = m_toSend.front();
+		std::byte const * const dataPtr = &data[0];
+		ssize_t size = data.size() * sizeof(data[0]);
+		auto sizeSent = 0;
+
+		while (sizeSent < size)
+		{
+			ssize_t rc = 0;
+			do
+			{
+				rc = ::write(sock, dataPtr + sizeSent,
+					size - sizeSent);
+			} while (rc == -1 && errno == EINTR);
+			if (rc == -1) {
+				return false;
+			}
+			sizeSent += rc;
+		}
+		m_toSend.pop();
+		return true;
 	}
 }
