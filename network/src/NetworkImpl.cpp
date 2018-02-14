@@ -15,7 +15,10 @@ namespace zia::network
 	bool NetworkImpl::config(zia::api::Conf const & conf)
 	{
 		// TODO
-		m_port = 4242;
+		if (m_port == 0)
+		{
+			m_port = 8080; // Default port value
+		}
 		return false;
 	}
 
