@@ -1,6 +1,7 @@
 #include "NetworkImpl.hpp"
 
 #if defined _WIN32
+#include <Windows.h>
 #define ZIA_MODULE_API __declspec(dllexport)
 #else
 #define ZIA_MODULE_API

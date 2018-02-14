@@ -56,7 +56,7 @@ namespace zia::network
 				// if remainingBufferSize >= length, return true
 				// else return false
 			}
-			catch (std::exception const &e)
+			catch (std::exception const &)
 			{
 				rc = false;
 			}

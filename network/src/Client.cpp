@@ -1,3 +1,11 @@
+#if defined(_WIN32)
+# include <io.h>
+# define read _read
+# define write _write
+# include <BaseTsd.h>
+using ssize_t = SSIZE_T;
+#endif
+
 #include <string>
 #include "Client.hpp"
 
@@ -11,7 +19,7 @@ namespace zia::network
 			std::chrono::steady_clock::now(),
 			{
 				sockaddr.sin_addr.s_addr,
-				std::string(inet_ntoa(sockaddr.sin_addr))
+				std::string(inet_ntoa(sockaddr.sin_addr)) // TODO: use inet_ntop() instead for IPV6 support
 			}, ntohs(sockaddr.sin_port), &m_implSocket}
 	{
 	}
