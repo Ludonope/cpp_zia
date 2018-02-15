@@ -60,10 +60,11 @@ enable_testing()
 
 # Build static libraries
 add_subdirectory(common)
+add_subdirectory(libcrypto)
 
 # Build the core
 add_subdirectory(core)
 
 # Build the modules
 add_subdirectory(network)
-add_subdirectory(network_ssl)
+#add_subdirectory(network_ssl)
