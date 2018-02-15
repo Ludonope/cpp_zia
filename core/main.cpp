@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include "ConfigLoader.hpp"
+#include "ModuleLoader.hpp"
 
 int main(int ac, char *av[])
 {
@@ -14,8 +15,8 @@ int main(int ac, char *av[])
 	while (1)
 	{
 		confLoader.load();
-		auto const modules = ModuleLoader(confLoader.getConfiguration());
-		// Create the pipeline
+		auto const modules = zia::core::ModuleLoader(confLoader.getConfiguration());
+		// TODO: Create the pipeline
 		while (1)
 		{
 			if (confLoader.shouldReload())

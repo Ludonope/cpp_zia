@@ -10,10 +10,6 @@ namespace zia::core
 	{
 	}
 
-	ConfigLoader::~ConfigLoader()
-	{
-	}
-
 	ConfigLoader::ConfigLoader(ConfigLoader const &other) :
 		m_config(other.m_config)
 	{
@@ -42,9 +38,9 @@ namespace zia::core
 		return *this;
 	}
 
-	void load()
+	void ConfigLoader::load()
 	{
-		// TODO: Implement
+		// TODO: Implement and fill m_config
 	}
 
 	std::string ConfigLoader::getHash() const noexcept
