@@ -1,6 +1,8 @@
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 #include "ConfigLoader.hpp"
-#include "ModuleLoader.hpp"
+#include "ModuleManager.hpp"
 
 int main(int ac, char *av[])
 {
@@ -15,16 +17,18 @@ int main(int ac, char *av[])
 	while (1)
 	{
 		confLoader.load();
-		auto const modules = zia::core::ModuleLoader(confLoader.getConfiguration());
-		// TODO: Create the pipeline
+		auto modules = zia::core::ModuleManager(confLoader.getConfiguration());
+		modules.start();
 		while (1)
 		{
 			if (confLoader.shouldReload())
 			{
-				// TODO: Wait for current processing to end
+				modules.stop();
 				break;
 			}
-			// Process requests
+			using namespace std::chrono_literals;
+
+			std::this_thread::sleep_for(250ms);
 		}
 	}
 	return EXIT_SUCCESS;
