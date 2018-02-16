@@ -21,7 +21,7 @@ namespace zia::network
 		HttpRingBuffer &operator=(HttpRingBuffer &&);
 
 		bool hasHeader() const noexcept;
-		bool hasRequest() const noexcept;
+		bool hasRequest() noexcept;
 		api::Net::Raw getRequest() noexcept;
 
 	private:

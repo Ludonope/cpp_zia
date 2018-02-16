@@ -97,6 +97,22 @@ namespace zia
 			}
 		}
 
+		// Simulate a read
+		void read(std::size_t const len) noexcept
+		{
+			for (std::size_t i = 0; i < len; ++i)
+			{
+				if (m_ndxRead == sizeof(m_data))
+				{
+					m_ndxRead = 0;
+				}
+				m_data[m_ndxRead] = std::byte{'\0'};
+				++m_ndxRead;
+				assert(m_availableData > 0);
+				--m_availableData;
+			}
+		}
+
 		// Get differences of byte between read cursor and write cursor (a.k.a: available datas)
 		inline std::size_t getAvailableData() const noexcept
 		{
