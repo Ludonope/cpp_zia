@@ -41,7 +41,7 @@ namespace zia::network
 	{
 		auto const sock = m_implSocket.sock;
 		ssize_t rc = 0;
-		std::array<std::byte, detail::HTTP_BUFFER_SIZE> buffer = {};
+		std::array<std::byte, Client::READ_SIZE> buffer = {};
 
 		do
 		{
