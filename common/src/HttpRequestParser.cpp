@@ -164,9 +164,9 @@ namespace zia::http
 		return std::string_view(input, size);
 	}
 
-	api::HttpRequest parseRequest(std::byte const *raw)
+	api::HttpRequest parseRequest(api::Net::Raw const &input)
 	{
-		return parseRequest(getHeader(raw));
+		return parseRequest(getHeader(input.data()));
 	}
 
 	api::HttpRequest parseRequest(std::byte const *raw, std::size_t &bodyLen)

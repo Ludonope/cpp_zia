@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include "api/conf.h"
 #include "api/net.h"
 #include "api/module.h"
@@ -23,14 +24,35 @@ namespace zia::core
 		void stop();
 
 	private:
-		using ModuleList = std::vector<std::unique_ptr<api::Module>>;
+		using ModuleDef = std::pair<std::unique_ptr<api::Module>, std::string>;
+		using ModuleList = std::vector<ModuleDef>;
 		api::Conf			m_conf;
 		std::unique_ptr<api::Net>	m_networkModule = nullptr;
 		ModuleList			m_receiveModule = {};
 		ModuleList			m_processingModule = {};
 		ModuleList			m_sendingModule = {};
 
+		void	loadModules() noexcept;
+		using ModuleConfList = std::vector<std::string>;
+		ModuleConfList getModulesPath() const noexcept;
+		using ModuleNameList = std::tuple<std::string, ModuleConfList, ModuleConfList, ModuleConfList>;
+		ModuleNameList getModules() const noexcept;
+		ModuleConfList getModuleList(api::ConfArray const &) const noexcept;
+
 		void	receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos);
 		static void	configureModuleList(ModuleList &list, api::Conf const &conf);
+
+#if defined __linux__
+		static constexpr auto ModulePrefix = "lib";
+		static constexpr auto ModuleExtension = ".so";
+#elif defined __APPLE__
+		static constexpr auto ModulePrefix = "lib";
+		static constexpr auto ModuleExtension = ".dylib";
+#elif defined _WIN32
+		static constexpr auto ModulePrefix = "";
+		static constexpr auto ModuleExtension = ".dll";
+#else
+#error	"Operating system not supported"
+#endif
 	};
 }
