@@ -70,5 +70,8 @@ namespace zia::network {
 		zia::api::NetInfo			m_infos;
 		std::queue<api::Net::Raw>		m_toSend;
 		std::unique_ptr<HttpRingBuffer>		m_buffer;
+
+		static constexpr auto READ_SIZE = 4096;
+		static_assert(READ_SIZE <= detail::HTTP_BUFFER_SIZE);
 	};
 }

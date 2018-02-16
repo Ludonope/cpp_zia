@@ -79,7 +79,6 @@ namespace zia::core
 	void ModuleManager::loadModules() noexcept
 	{
 		auto const &&modulePath = getModulesPath();
-		std::cout << "Module Path loaded" << std::endl;
 		auto const [moduleNetwork, moduleReceive, moduleProcessing, moduleSend] = getModules();
 		auto const moduleLoader = [&](auto moduleListInput, auto &moduleListOutput){
 			for (auto const &path: modulePath)
