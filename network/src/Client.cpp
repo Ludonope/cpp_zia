@@ -1,15 +1,17 @@
 #if defined(_WIN32)
 # include <io.h>
 # include <BaseTsd.h>
-# define read _read
-# define write _write
 #endif
 
 #include <string>
 #include "Client.hpp"
 
-#include <iostream>
-#include <exception>
+#include <iostream> // TODO: remove
+
+#if defined (_WIN32)
+//# define read _read
+//# define write _write
+#endif
 
 namespace zia::network
 {
@@ -45,7 +47,8 @@ namespace zia::network
 
 		do
 		{
-			rc = read(sock, buffer.data(), buffer.size() - 1);
+			rc = ::recv(sock, reinterpret_cast<char *>(buffer.data()), buffer.size() - 1, 0);
+			std::cout << strerror(errno);
 		} while (rc == -1 && errno == EINTR);
 		if (rc == 0)
 		{
@@ -72,8 +75,8 @@ namespace zia::network
 			ssize_t rc = 0;
 			do
 			{
-				rc = ::write(sock, dataPtr + sizeSent,
-					size - sizeSent);
+				rc = ::send(sock, reinterpret_cast<char const * const>(dataPtr) + sizeSent,
+					size - sizeSent, 0);
 			} while (rc == -1 && errno == EINTR);
 			if (rc == 0)
 			{

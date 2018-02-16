@@ -2,6 +2,8 @@
 #include "HttpRingBuffer.hpp"
 #include "HttpRequestParser.hpp"
 
+#include <iostream> // TODO: remove
+
 namespace zia::network
 {
 		HttpRingBuffer::HttpRingBuffer() noexcept :
@@ -53,6 +55,7 @@ namespace zia::network
 				// Datas is guaranted to contain at a double CRLF
 				auto const datas = this->peek();
 				http::parseRequest(&datas[0], contentLength);
+				std::cout << reinterpret_cast<char const *>(&datas[0]) << std::endl;
 				rc = (datas.size() - headerLength) >= contentLength;
 			}
 			catch (std::exception const &)
