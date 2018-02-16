@@ -125,6 +125,89 @@ TEST(HttpRingBuffer, HasHeader_ValidWithMoreAfter)
 	ASSERT_EQ(buffer.hasHeader(), true);
 }
 
+TEST(HttpRingBuffer, HasRequest_Empty)
+{
+	char const *payload = "";
+	std::byte const *payloadPtr =
+		reinterpret_cast<decltype(payloadPtr)>(payload);
+	zia::network::HttpRingBuffer	buffer;
+
+	buffer.write(payloadPtr, std::strlen(payload));
+	ASSERT_EQ(buffer.hasRequest(), false);
+}
+
+TEST(HttpRingBuffer, HasRequest_Invalid)
+{
+	char const *payload = 
+	"GET /hello.htm HTTP/1.1\r\n"
+	"User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n"
+	"Host: www.tutorialspoint.com\r\n"
+	"Accept-Language: en-us\r\n"
+	"Accept-Encoding: gzip, deflate\r\n"
+	"Connection: Keep-Alive\r\n"
+	"";
+	std::byte const *payloadPtr =
+		reinterpret_cast<decltype(payloadPtr)>(payload);
+	zia::network::HttpRingBuffer	buffer;
+
+	buffer.write(payloadPtr, std::strlen(payload));
+	ASSERT_EQ(buffer.hasRequest(), false);
+}
+
+TEST(HttpRingBuffer, HasRequest_Valid)
+{
+	char const *payload = 
+	"GET /hello.htm HTTP/1.1\r\n"
+	"User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n"
+	"Host: www.tutorialspoint.com\r\n"
+	"Accept-Language: en-us\r\n"
+	"Accept-Encoding: gzip, deflate\r\n"
+	"Connection: Keep-Alive\r\n"
+	"\r\n";
+	std::byte const *payloadPtr =
+		reinterpret_cast<decltype(payloadPtr)>(payload);
+	zia::network::HttpRingBuffer	buffer;
+
+	buffer.write(payloadPtr, std::strlen(payload));
+	ASSERT_EQ(buffer.hasRequest(), true);
+}
+
+TEST(HttpRingBuffer, HasRequest_ValidWithContent)
+{
+	char const *payload = 
+	"POST /path/script.cgi HTTP/1.0\r\n"
+	"From: frog@jmarshall.com\r\n"
+	"User-Agent: HTTPTool/1.0\r\n"
+	"Content-Type: application/x-www-form-urlencoded\r\n"
+	"Content-Length: 32\r\n"
+	"\r\n"
+	"home=Cosby&favorite+flavor=flies";
+	std::byte const *payloadPtr =
+		reinterpret_cast<decltype(payloadPtr)>(payload);
+	zia::network::HttpRingBuffer	buffer;
+
+	buffer.write(payloadPtr, std::strlen(payload));
+	ASSERT_EQ(buffer.hasRequest(), true);
+}
+
+TEST(HttpRingBuffer, HasRequest_InvalidWithContent)
+{
+	char const *payload = 
+	"POST /path/script.cgi HTTP/1.0\r\n"
+	"From: frog@jmarshall.com\r\n"
+	"User-Agent: HTTPTool/1.0\r\n"
+	"Content-Type: application/x-www-form-urlencoded\r\n"
+	"Content-Length: 320\r\n"
+	"\r\n"
+	"home=Cosby&favorite+flavor=flies";
+	std::byte const *payloadPtr =
+		reinterpret_cast<decltype(payloadPtr)>(payload);
+	zia::network::HttpRingBuffer	buffer;
+
+	buffer.write(payloadPtr, std::strlen(payload));
+	ASSERT_EQ(buffer.hasRequest(), false);
+}
+
 TEST(HttpRingBuffer, GetRequest)
 {
 	char const *payload = 
