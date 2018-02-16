@@ -126,7 +126,7 @@ namespace zia::network
 			if (FD_ISSET(sock, &readfds))
 			{
 				clientStatus = (*ite)->handleInput();
-				if (clientStatus != Client::Status::ERROR &&
+				if (clientStatus != Client::Status::ERR &&
 					(*ite)->hasRequest()) {
 					std::cout << "Found a request !" << std::endl;
 					auto const &raw = (*ite)->getRaw();
@@ -143,11 +143,11 @@ namespace zia::network
 			}
 			if (FD_ISSET(sock, &exceptfds))
 			{
-				clientStatus = Client::Status::ERROR;
+				clientStatus = Client::Status::ERR;
 			}
 
 			if (clientStatus == Client::Status::DONE ||
-				clientStatus == Client::Status::ERROR ||
+				clientStatus == Client::Status::ERR ||
 				(*ite)->hasTimedOut())
 			{
 				ite = m_clients.erase(ite);
@@ -191,6 +191,7 @@ namespace zia::network
 #if defined _WIN32
 	void NetworkComm::initWindows() const
 	{
+		std::cout << "Init\n";
 		if (!m_nbSockets && !m_WSAInited)
 		{
 			WSADATA wsa;
@@ -209,6 +210,7 @@ namespace zia::network
 	{
 		if (m_socket != -1)
 		{
+			std::cout << "Deinit\n";
 			--m_nbSockets;
 			if (!m_nbSockets)
 			{

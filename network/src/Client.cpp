@@ -8,6 +8,9 @@
 #include <string>
 #include "Client.hpp"
 
+#include <iostream>
+#include <exception>
+
 namespace zia::network
 {
 	Client::Client(sock_t const socket, 
@@ -42,7 +45,7 @@ namespace zia::network
 
 		do
 		{
-			rc = read(sock, buffer.data(), sizeof(buffer) - 1);
+			rc = read(sock, buffer.data(), buffer.size() - 1);
 		} while (rc == -1 && errno == EINTR);
 		if (rc == 0)
 		{
@@ -50,7 +53,7 @@ namespace zia::network
 		}
 		else if (rc == -1)
 		{
-			return Status::ERROR;
+			return Status::ERR;
 		}
 		m_buffer->write(buffer.data(), rc);
 		return Status::OK;
@@ -78,7 +81,7 @@ namespace zia::network
 			}
 			else if (rc == -1)
 			{
-				return Status::ERROR;
+				return Status::ERR;
 			}
 			sizeSent += rc;
 		}
