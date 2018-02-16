@@ -18,8 +18,8 @@ namespace zia::network {
 				std::uint16_t const port);
 		~NetworkComm();
 
-		NetworkComm(NetworkComm const &) = default;
-		NetworkComm &operator=(NetworkComm const &) = default;
+		NetworkComm(NetworkComm const &) = delete;
+		NetworkComm &operator=(NetworkComm const &) = delete;
 
 		NetworkComm(NetworkComm &&);
 		NetworkComm &operator=(NetworkComm &&);

@@ -6,6 +6,7 @@
 #include "api/conf.h"
 #include "api/net.h"
 #include "api/module.h"
+#include "LibLoader.hpp"
 
 namespace zia::core
 {
@@ -26,7 +27,9 @@ namespace zia::core
 	private:
 		using ModuleDef = std::pair<std::unique_ptr<api::Module>, std::string>;
 		using ModuleList = std::vector<ModuleDef>;
+		using LibraryList = std::vector<LibLoader>;
 		api::Conf			m_conf;
+		LibraryList			m_libs = {};
 		std::unique_ptr<api::Net>	m_networkModule = nullptr;
 		ModuleList			m_receiveModule = {};
 		ModuleList			m_processingModule = {};

@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream> // TODO: rm
 #include "HttpRingBuffer.hpp"
 #include "HttpRequestParser.hpp"
 
@@ -43,6 +44,8 @@ namespace zia::network
 			auto const headerLength = getHeaderLength();
 			auto rc = true;
 
+			std::cout << "Checking if any header..." << std::endl;
+			std::cout << "HeaderLength: " << headerLength << std::endl;
 			if (headerLength == 0)
 			{
 				return false;
@@ -53,11 +56,13 @@ namespace zia::network
 				std::size_t remainingSize = 0;
 				// Datas is guaranted to contain at a double CRLF
 				auto const datas = this->peek();
+				std::cout << reinterpret_cast<char const *>(&datas[0]) << std::endl;
 				http::parseRequest(&datas[0], contentLength);
 				rc = (remainingSize >= contentLength);
 			}
-			catch (std::exception const &)
+			catch (std::exception const &e)
 			{
+				std::cout << e.what() << std::endl;
 				rc = false;
 			}
 			return rc;

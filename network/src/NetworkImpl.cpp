@@ -1,3 +1,4 @@
+#include <iostream> // TODO: rm ?
 #include "NetworkImpl.hpp"
 #include "NetworkComm.hpp"
 
@@ -24,6 +25,7 @@ namespace zia::network
 
 	bool NetworkImpl::run(zia::api::Net::Callback cb)
 	{
+		std::cout << "Starting server..." << std::endl;
 		if (m_thread || m_running) {
 			return false;
 		}
@@ -31,12 +33,14 @@ namespace zia::network
 		try {
 			NetworkComm netComm(std::move(cb), m_port);
 			m_thread = std::make_unique<std::thread>(
-				[&](){ this->execute(std::move(netComm)); }
+				[comm = std::move(netComm), this]() mutable {
+					this->execute(std::move(comm)); 
+				}
 			);
 			m_running = true;
 		}
-		catch (std::exception const &) {
-			// TODO: Log ?
+		catch (std::exception const &e) {
+			std::cerr << e.what() << std::endl;
 			rc = false;
 		}
 		return rc;
@@ -53,6 +57,7 @@ namespace zia::network
 
 	bool NetworkImpl::stop()
 	{
+		std::cout << "Stopping server" << std::endl;
 		if (!m_running || !m_thread) {
 			return false;
 		}
@@ -66,6 +71,7 @@ namespace zia::network
 
 	void NetworkImpl::execute(NetworkComm &&netComm) noexcept
 	{
+		std::cout << "Server running on port " << m_port << std::endl;
 		while (m_running)
 		{
 			while (!m_toSend.empty())

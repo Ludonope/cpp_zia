@@ -19,7 +19,9 @@ namespace zia::network
 			{
 				sockaddr.sin_addr.s_addr,
 				std::string(inet_ntoa(sockaddr.sin_addr)) // TODO: use inet_ntop() instead for IPV6 support
-			}, ntohs(sockaddr.sin_port), &m_implSocket}
+			}, ntohs(sockaddr.sin_port), &m_implSocket},
+		m_toSend(),
+		m_buffer(std::make_unique<HttpRingBuffer>())
 	{
 	}
 
@@ -32,49 +34,7 @@ namespace zia::network
 		}
 	}
 
-	Client::Client(Client const &other) :
-		m_implSocket(other.m_implSocket),
-		m_infos(other.m_infos),
-		m_toSend(other.m_toSend)
-	{
-		m_infos.sock = &m_implSocket;
-	}
-
-	Client::Client(Client &&other) :
-		m_implSocket(std::move(other.m_implSocket)),
-		m_infos(std::move(other.m_infos)),
-		m_toSend(std::move(other.m_toSend))
-	{
-		m_infos.sock = &m_implSocket;
-		other.m_implSocket.sock = -1;
-	}
-
-	Client &Client::operator=(Client const &other)
-	{
-		if (this != &other)
-		{
-			m_implSocket = other.m_implSocket;
-			m_infos = other.m_infos;
-			m_infos.sock = &m_implSocket;
-			m_toSend = other.m_toSend;
-		}
-		return *this;
-	}
-
-	Client &Client::operator=(Client &&other)
-	{
-		if (this != &other)
-		{
-			m_implSocket = std::move(other.m_implSocket);
-			m_infos = std::move(other.m_infos);
-			m_infos.sock = &m_implSocket;
-			other.m_implSocket.sock = -1;
-			m_toSend = std::move(other.m_toSend);
-		}
-		return *this;
-	}
-
-	bool Client::handleInput() noexcept
+	Client::Status Client::handleInput() noexcept
 	{
 		auto const sock = m_implSocket.sock;
 		ssize_t rc = 0;
@@ -84,14 +44,19 @@ namespace zia::network
 		{
 			rc = read(sock, buffer.data(), sizeof(buffer) - 1);
 		} while (rc == -1 && errno == EINTR);
-		if (rc <= 0) {
-			return false;
+		if (rc == 0)
+		{
+			return Status::DONE;
 		}
-		m_buffer.write(buffer.data(), rc);
-		return true;
+		else if (rc == -1)
+		{
+			return Status::ERROR;
+		}
+		m_buffer->write(buffer.data(), rc);
+		return Status::OK;
 	}
 
-	bool Client::handleOutput() noexcept
+	Client::Status Client::handleOutput() noexcept
 	{
 		auto const sock = m_implSocket.sock;
 		auto const data = m_toSend.front();
@@ -107,12 +72,17 @@ namespace zia::network
 				rc = ::write(sock, dataPtr + sizeSent,
 					size - sizeSent);
 			} while (rc == -1 && errno == EINTR);
-			if (rc == -1) {
-				return false;
+			if (rc == 0)
+			{
+				return Status::DONE;
+			}
+			else if (rc == -1)
+			{
+				return Status::ERROR;
 			}
 			sizeSent += rc;
 		}
 		m_toSend.pop();
-		return true;
+		return Status::OK;
 	}
 }

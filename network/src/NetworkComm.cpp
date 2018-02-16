@@ -1,6 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
+#include <iostream> // TODO: rm
 #include "NetworkComm.hpp"
 
 namespace zia::network
@@ -36,12 +37,14 @@ namespace zia::network
 		{
 			throw std::runtime_error("Cannot listen on socket");
 		}
+		std::cout << "Socket: " << m_socket << std::endl;
 	}
 
 	NetworkComm::~NetworkComm()
 	{
 		if (m_socket != -1)
 		{
+			std::cout << "Closing socket..." << m_socket << std::endl;
 			closesocket(m_socket);
 			m_socket = -1;
 		}
@@ -54,7 +57,7 @@ namespace zia::network
 		m_respCallback(std::move(other.m_respCallback)),
 		m_port(std::move(other.m_port)),
 		m_socket(std::move(other.m_socket)),
-		m_sockAddr(std::move(m_sockAddr))
+		m_sockAddr(std::move(other.m_sockAddr))
 	{
 		other.m_socket = -1;
 	}
@@ -64,7 +67,7 @@ namespace zia::network
 		if (&other != this)
 		{
 			m_respCallback = std::move(other.m_respCallback);
-			m_port = std::move(other.m_socket);
+			m_port = std::move(other.m_port);
 			m_socket = std::move(other.m_socket);
 			m_sockAddr = std::move(other.m_sockAddr);
 			other.m_socket = -1;
@@ -80,7 +83,7 @@ namespace zia::network
 
 		do
 		{
-			auto	fd_max = m_socket;
+			std::int32_t	fd_max = m_socket;
 
 			FD_ZERO(&readfds);
 			FD_ZERO(&writefds);
@@ -101,7 +104,6 @@ namespace zia::network
 					fd_max = sock;
 				}
 			}
-
 			rc = select(fd_max + 1, &readfds, &writefds,
 				&exceptfds, nullptr);
 		} while (rc == -1 && errno == EINTR);
@@ -118,17 +120,15 @@ namespace zia::network
 		}
 		for (auto ite = std::begin(m_clients); ite != std::end(m_clients);)
 		{
-			auto mustDelete = false;
+			auto clientStatus = Client::Status::OK;
 			auto const sock = (*ite)->getSocket();
 
 			if (FD_ISSET(sock, &readfds))
 			{
-				mustDelete = !((*ite)->handleInput());
-			}
-			if (FD_ISSET(sock, &writefds))
-			{
-				mustDelete = !((*ite)->handleOutput());
-				if (!mustDelete && (*ite)->hasRequest()) {
+				clientStatus = (*ite)->handleInput();
+				if (clientStatus != Client::Status::ERROR &&
+					(*ite)->hasRequest()) {
+					std::cout << "Found a request !" << std::endl;
 					auto const &raw = (*ite)->getRaw();
 					auto const &infos = (*ite)->getInfos();
 
@@ -136,12 +136,19 @@ namespace zia::network
 					m_respCallback(raw, infos);
 				}
 			}
+			if (FD_ISSET(sock, &writefds))
+			{
+				std::cout << "Ready to write !" << std::endl;
+				clientStatus = (*ite)->handleOutput();
+			}
 			if (FD_ISSET(sock, &exceptfds))
 			{
-				mustDelete = true;
+				clientStatus = Client::Status::ERROR;
 			}
 
-			if (mustDelete || (*ite)->hasTimedOut())
+			if (clientStatus == Client::Status::DONE ||
+				clientStatus == Client::Status::ERROR ||
+				(*ite)->hasTimedOut())
 			{
 				ite = m_clients.erase(ite);
 			}

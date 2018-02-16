@@ -5,18 +5,26 @@
 #include "ImplSocket.hpp"
 #include "HttpRingBuffer.hpp"
 #include <queue>
+#include <memory>
 
 namespace zia::network {
 	class Client final
 	{
 	public:
+		enum class Status : std::uint8_t
+		{
+			OK,
+			DONE,
+			ERROR
+		};
+
 		Client(sock_t const socket, sockaddr_in_t const &sockaddr);
 		~Client();
 
-		Client(Client const &);
-		Client(Client &&);
-		Client &operator=(Client const &);
-		Client &operator=(Client &&);
+		Client(Client const &) = delete;
+		Client(Client &&) = delete;
+		Client &operator=(Client const &) = delete;
+		Client &operator=(Client &&) = delete;
 
 		inline bool canWrite() const noexcept
 		{
@@ -41,16 +49,16 @@ namespace zia::network {
 
 		inline bool hasRequest() const noexcept
 		{
-			return m_buffer.hasRequest();
+			return m_buffer->hasRequest();
 		}
 
 		inline zia::api::Net::Raw getRaw() noexcept
 		{
-			return m_buffer.getRequest();
+			return m_buffer->getRequest();
 		}
 
-		bool handleInput() noexcept;
-		bool handleOutput() noexcept;
+		Client::Status handleInput() noexcept;
+		Client::Status handleOutput() noexcept;
 
 		inline void send(api::Net::Raw &&data)
 		{
@@ -58,9 +66,9 @@ namespace zia::network {
 		}
 
 	private:
-		zia::api::ImplSocket		m_implSocket;
-		zia::api::NetInfo		m_infos;
-		std::queue<api::Net::Raw>	m_toSend;
-		HttpRingBuffer			m_buffer;
+		zia::api::ImplSocket			m_implSocket;
+		zia::api::NetInfo			m_infos;
+		std::queue<api::Net::Raw>		m_toSend;
+		std::unique_ptr<HttpRingBuffer>		m_buffer;
 	};
 }

@@ -2,6 +2,7 @@
 #include <variant>
 #include "ModuleManager.hpp"
 #include "HttpRequestParser.hpp"
+#include "FileHelper.hpp"
 
 namespace zia::core
 {
@@ -62,7 +63,7 @@ namespace zia::core
 			auto modules = m_conf.at("modules").v;
 			auto datas = std::get<api::ConfObject>(modules);
 			return {
-				std::get<std::string>(datas.at("network").v),
+				ModuleManager::ModulePrefix + std::get<std::string>(datas.at("network").v) + ModuleManager::ModuleExtension,
 				getModuleList(std::get<api::ConfArray>(datas.at("receive").v)),
 				getModuleList(std::get<api::ConfArray>(datas.at("processing").v)),
 				getModuleList(std::get<api::ConfArray>(datas.at("send").v))
@@ -77,21 +78,58 @@ namespace zia::core
 
 	void ModuleManager::loadModules() noexcept
 	{
-		auto const &&modulePath = std::move(getModulesPath());
+		auto const &&modulePath = getModulesPath();
 		std::cout << "Module Path loaded" << std::endl;
-		auto const [moduleNetwork, moduleReceive, moduleProcessing, moduleSend] = std::move(getModules());
+		auto const [moduleNetwork, moduleReceive, moduleProcessing, moduleSend] = getModules();
 		auto const moduleLoader = [&](auto moduleListInput, auto &moduleListOutput){
 			for (auto const &path: modulePath)
 			{
 				for (auto const &module : moduleListInput) {
 					auto moduleFullPath = path + '/' + module;
-					// TODO: Check if exists and load
-
-					std::cout << "Trying to load " << moduleFullPath << std::endl;
-					moduleListOutput.push_back({nullptr, moduleFullPath});
+					if (zia::fs::exists(moduleFullPath))
+					{
+						try
+						{
+							m_libs.push_back(std::move(LibLoader(moduleFullPath)));
+							auto const func = m_libs.back().getFunction<api::Module *()>("create");
+							if (func)
+							{
+								moduleListOutput.push_back({std::unique_ptr<api::Module>(func()), moduleFullPath});
+							}
+						}
+						catch (std::exception const &e)
+						{
+							std::cerr << e.what() << std::endl;
+						}
+					}
 				}
 			}
 		};
+
+		if (moduleNetwork != "")
+		{
+			for (auto const &path : modulePath)
+			{
+				auto const moduleFullPath = path + '/' + moduleNetwork;
+				if (zia::fs::exists(moduleFullPath))
+				{
+					try
+					{
+						m_libs.push_back(std::move(LibLoader(moduleFullPath)));
+						auto const func = m_libs.back().getFunction<api::Net *()>("create");
+						if (func)
+						{
+							m_networkModule = std::unique_ptr<api::Net>(func());
+						}
+					}
+					catch (std::exception const &e)
+					{
+						std::cout << e.what() << std::endl;
+					}
+					break;
+				}
+			}
+		}
 		moduleLoader(moduleReceive, m_receiveModule);
 		moduleLoader(moduleProcessing, m_processingModule);
 		moduleLoader(moduleSend, m_sendingModule);
@@ -129,16 +167,25 @@ namespace zia::core
 
 		duplex.info = infos;
 		duplex.raw_req = raw;
-		duplex.req = http::parseRequest(raw);
-		auto const moduleProcess = [&](ModuleList &list){
-			for (auto &module : list)
-			{
-				module.first->exec(duplex);
-			}
-		};
-		moduleProcess(m_receiveModule);
-		moduleProcess(m_processingModule);
-		moduleProcess(m_sendingModule);
+
+		try
+		{
+			duplex.req = http::parseRequest(raw);
+			auto const moduleProcess = [&](ModuleList &list){
+				for (auto &module : list)
+				{
+					module.first->exec(duplex);
+				}
+			};
+			moduleProcess(m_receiveModule);
+			moduleProcess(m_processingModule);
+			moduleProcess(m_sendingModule);
+		}
+		catch (std::exception const &e)
+		{
+			std::cerr << e.what() << std::endl;
+			// TODO: Send error 500
+		}
 		// TODO: duplex.raw_resp = http::toString(duplex.resp);
 		duplex.raw_resp = api::Net::Raw{std::byte{'Y'}, std::byte{'a'}, std::byte{'y'}};
 		m_networkModule->send(infos.sock, duplex.raw_resp);
