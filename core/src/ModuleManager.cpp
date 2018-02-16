@@ -8,6 +8,7 @@ namespace zia::core
 	ModuleManager::ModuleManager(api::Conf const &conf) :
 		m_conf(conf)
 	{
+		loadModules();
 	}
 
 	ModuleManager::~ModuleManager()
@@ -77,6 +78,7 @@ namespace zia::core
 	void ModuleManager::loadModules() noexcept
 	{
 		auto const &&modulePath = std::move(getModulesPath());
+		std::cout << "Module Path loaded" << std::endl;
 		auto const [moduleNetwork, moduleReceive, moduleProcessing, moduleSend] = std::move(getModules());
 		auto const moduleLoader = [&](auto moduleListInput, auto &moduleListOutput){
 			for (auto const &path: modulePath)

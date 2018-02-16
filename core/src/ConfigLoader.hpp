@@ -31,6 +31,7 @@ namespace zia::core
 			{
 				auto const &&currentHash = getHash();
 				return m_hash != currentHash;
+
 			}
 			return false;
 		}

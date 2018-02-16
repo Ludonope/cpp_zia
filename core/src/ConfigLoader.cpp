@@ -40,7 +40,25 @@ namespace zia::core
 
 	void ConfigLoader::load()
 	{
+#if 1
+		// Mock datas
+		api::ConfArray const modulesPath = {
+			api::ConfValue{std::string{"."}},
+			api::ConfValue{std::string{"./libs"}},
+			api::ConfValue{std::string{"./modules"}}
+		};
+		api::ConfObject modulesLists = {};
+		modulesLists["network"] = api::ConfValue{std::string{"zia_network"}};
+		modulesLists["receive"] = api::ConfValue{api::ConfArray{}};
+		modulesLists["processing"] = api::ConfValue{api::ConfArray{}};
+		modulesLists["send"] = api::ConfValue{api::ConfArray{}};
+
+		m_config = api::ConfObject{};
+		m_config["modules_path"] = api::ConfValue{modulesPath};
+		m_config["modules"] = api::ConfValue{modulesLists};
+#endif
 		// TODO: Implement and fill m_config
+		m_hash = getHash();
 	}
 
 	std::string ConfigLoader::getHash() const noexcept
