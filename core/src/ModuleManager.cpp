@@ -169,7 +169,9 @@ namespace zia::core
 
 		try
 		{
+			std::cout << "Parsing request\n";
 			duplex.req = http::parseRequest(raw);
+			std::cout << "Request parsed\n";
 			auto const moduleProcess = [&](ModuleList &list){
 				for (auto &module : list)
 				{
@@ -179,15 +181,19 @@ namespace zia::core
 			moduleProcess(m_receiveModule);
 			moduleProcess(m_processingModule);
 			moduleProcess(m_sendingModule);
+			std::cout << "Execution over\n";
 		}
 		catch (std::exception const &e)
 		{
-			std::cerr << e.what() << std::endl;
+			std::cout << "Error: ";
+			std::cerr << e.what() << '\n' << std::endl;
 			// TODO: Send error 500
 		}
 		// TODO: duplex.raw_resp = http::toString(duplex.resp);
 		duplex.raw_resp = api::Net::Raw{std::byte{'Y'}, std::byte{'a'}, std::byte{'y'}};
+		std::cout << "Sending response\n";
 		m_networkModule->send(infos.sock, duplex.raw_resp);
+		std::cout << "Done\n";
 	}
 
 	void	ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)

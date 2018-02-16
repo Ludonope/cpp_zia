@@ -38,13 +38,6 @@ namespace zia::http
 
 		while (lex && !lex.peekIs({ TokenType::CRLF, TokenType::SPACE }))
 		{
-			auto next = lex.next();
-
-			if (next.type == TokenType::UNKNOWN)
-			{
-				throw std::invalid_argument("Invalid token in uri");
-			}
-
 			uri += lex.next().value;
 		}
 

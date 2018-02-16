@@ -6,13 +6,6 @@
 #include <string>
 #include "Client.hpp"
 
-#include <iostream> // TODO: remove
-
-#if defined (_WIN32)
-//# define read _read
-//# define write _write
-#endif
-
 namespace zia::network
 {
 	Client::Client(sock_t const socket, 
@@ -48,7 +41,6 @@ namespace zia::network
 		do
 		{
 			rc = ::recv(sock, reinterpret_cast<char *>(buffer.data()), buffer.size() - 1, 0);
-			std::cout << strerror(errno);
 		} while (rc == -1 && errno == EINTR);
 		if (rc == 0)
 		{
