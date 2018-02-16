@@ -7,7 +7,7 @@ namespace zia::network
 {
 	namespace detail
 	{
-		static constexpr auto HTTP_BUFFER_SIZE = 4096 * 1024;
+		static constexpr auto HTTP_BUFFER_SIZE = 4096 * 128;
 	}
 
 	class HttpRingBuffer final : public RingBuffer<detail::HTTP_BUFFER_SIZE>

@@ -15,7 +15,7 @@ namespace zia::network {
 		{
 			OK,
 			DONE,
-			ERROR
+			ERR
 		};
 
 		Client(sock_t const socket, sockaddr_in_t const &sockaddr);
