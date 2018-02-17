@@ -67,4 +67,4 @@ add_subdirectory(core)
 
 # Build the modules
 add_subdirectory(network)
-#add_subdirectory(network_ssl)
+add_subdirectory(network_ssl)
