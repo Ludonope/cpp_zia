@@ -5,7 +5,7 @@
 
 namespace zia::http
 {
-	enum class TokenType
+	enum class RequestTokenType
 	{
 		END_OF_FILE,
 		CRLF,
@@ -31,12 +31,28 @@ namespace zia::http
 		UNKNOWN
 	};
 
+	enum class UriTokenType
+	{
+		END_OF_FILE,
+		COLON,
+		SLASH,
+		AT,
+		QUESTION,
+		HASH,
+		ID
+	};
+
+	template <typename _Type>
 	struct Token
 	{
 		Token() = delete;
 		~Token() noexcept = default;
 
-		Token(TokenType t, std::string_view val = "");
+		Token(_Type t, std::string_view val = "") :
+			type(t),
+			value(val)
+		{
+		}
 
 		Token(Token const &) = default;
 		Token &operator=(Token const &) = default;
@@ -44,11 +60,13 @@ namespace zia::http
 		Token(Token &&) noexcept = default;
 		Token &operator=(Token &&) noexcept = default;
 
-		TokenType type;
+		_Type type;
 		std::string_view value;
 		std::vector<Token> childs = {};
 
-		static const Token eof;
-		static const Token unknown;
+		using Type = _Type;
 	};
+
+	using ReqToken = Token<RequestTokenType>;
+	using UriToken = Token<UriTokenType>;
 }

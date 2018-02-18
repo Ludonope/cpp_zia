@@ -8,7 +8,8 @@
       "includePath": [
         "${env.INCLUDE}",
         "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
-        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\COMMON\\SRC"
       ],
       "defines": [
         "WIN32",
@@ -28,7 +29,8 @@
       "includePath": [
         "${env.INCLUDE}",
         "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
-        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\COMMON\\SRC"
       ],
       "defines": [
         "WIN32",
@@ -47,7 +49,8 @@
       "includePath": [
         "${env.INCLUDE}",
         "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
-        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\COMMON\\SRC"
       ],
       "defines": [
         "WIN32",
@@ -67,7 +70,8 @@
       "includePath": [
         "${env.INCLUDE}",
         "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SRC",
-        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA"
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\SZA",
+        "C:\\USERS\\LUDONOPE\\CODE\\ZIA\\COMMON\\SRC"
       ],
       "defines": [
         "WIN32",

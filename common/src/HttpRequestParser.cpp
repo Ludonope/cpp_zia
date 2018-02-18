@@ -3,13 +3,13 @@
 #include <string>
 #include <cstring>
 #include "HttpRequestParser.hpp"
-#include "RequestLexer.hpp"
+#include "Lexer.hpp"
 
 namespace zia::http
 {
 	static api::http::Method parseMethod(RequestLexer &lex)
 	{
-		auto meth = lex.nextChecked(TokenType::ID, "Expected an identifier as a method");
+		auto meth = lex.nextChecked(RequestTokenType::ID, "Expected an identifier as a method");
 		static const std::array<std::pair<const char *, api::http::Method>, 8> val{ {
 			{ "OPTIONS", api::http::Method::options },
 			{ "GET", api::http::Method::get },
@@ -36,17 +36,19 @@ namespace zia::http
 	{
 		std::string uri;
 
-		while (lex && !lex.peekIs({ TokenType::CRLF, TokenType::SPACE }))
+		while (lex && !lex.peekIs({ RequestTokenType::CRLF, RequestTokenType::SPACE }))
 		{
 			auto next = lex.next();
 
-			if (next.type == TokenType::UNKNOWN)
+			if (next.type == RequestTokenType::UNKNOWN)
 			{
 				throw std::invalid_argument("Invalid token in uri");
 			}
 
 			uri += lex.next().value;
 		}
+
+		// TODO: decode the uri (ex: "yolo.com/s?hello%20world" -> "yolo.com/s?hello world")
 
 		return uri;
 	}
@@ -55,7 +57,7 @@ namespace zia::http
 	{
 		std::string version;
 
-		while (lex && !lex.peekIs({ TokenType::CRLF, TokenType::SPACE }))
+		while (lex && !lex.peekIs({ RequestTokenType::CRLF, RequestTokenType::SPACE }))
 		{
 			version += lex.next().value;
 		}
@@ -83,20 +85,20 @@ namespace zia::http
 		std::string header;
 		auto peek = lex.peek().type;
 
-		while (peek != TokenType::END_OF_FILE &&
-			peek != TokenType::COLON)
+		while (peek != RequestTokenType::END_OF_FILE &&
+			peek != RequestTokenType::COLON)
 		{
 			header += lex.next().value;
 			peek = lex.peek().type;
 		}
 
-		lex.nextChecked(TokenType::COLON, "Expected a ':' between the header name's and the content");
+		lex.nextChecked(RequestTokenType::COLON, "Expected a ':' between the header name's and the content");
 
 		std::string content;
 		peek = lex.peek().type;
 
-		while (peek != TokenType::END_OF_FILE &&
-			peek != TokenType::CRLF)
+		while (peek != RequestTokenType::END_OF_FILE &&
+			peek != RequestTokenType::CRLF)
 		{
 			content += lex.next().value;
 			peek = lex.peek().type;
@@ -111,22 +113,22 @@ namespace zia::http
 		api::HttpRequest req;
 
 		req.method = parseMethod(lex);
-		lex.nextChecked(TokenType::SPACE, "Expected a space after the method");
+		lex.nextChecked(RequestTokenType::SPACE, "Expected a space after the method");
 
 		req.uri = parseUri(lex);
-		lex.nextChecked(TokenType::SPACE, "Expected a space after the uri");
+		lex.nextChecked(RequestTokenType::SPACE, "Expected a space after the uri");
 
 		req.version = parseHttpVersion(lex);
-		lex.nextChecked(TokenType::CRLF, "Expected a CRLF after the http version");
+		lex.nextChecked(RequestTokenType::CRLF, "Expected a CRLF after the http version");
 
-		while (lex && lex.peek().type != TokenType::CRLF)
+		while (lex && lex.peek().type != RequestTokenType::CRLF)
 		{
 			auto[header, content] = parseHeader(lex);
 
 			req.headers[header] = content;
-			lex.nextChecked(TokenType::CRLF, "Expected a CRLF after a header");
+			lex.nextChecked(RequestTokenType::CRLF, "Expected a CRLF after a header");
 		}
-		lex.nextChecked(TokenType::CRLF, "Expected a CRLF at the end of the request");
+		lex.nextChecked(RequestTokenType::CRLF, "Expected a CRLF at the end of the request");
 
 		return req;
 	}
