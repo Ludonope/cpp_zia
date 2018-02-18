@@ -48,7 +48,7 @@ namespace zia::core
 			api::ConfValue{std::string{"./modules"}}
 		};
 		api::ConfObject modulesLists = {};
-		modulesLists["network"] = api::ConfValue{std::string{"zia_network"}};
+		modulesLists["network"] = api::ConfValue{std::string{"zia_network_ssl"}};
 		modulesLists["receive"] = api::ConfValue{api::ConfArray{}};
 		modulesLists["processing"] = api::ConfValue{api::ConfArray{}};
 		modulesLists["send"] = api::ConfValue{api::ConfArray{}};
