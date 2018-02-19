@@ -147,8 +147,8 @@ namespace zia::core
 				std::cerr << "Error loading network "
 					"module configuration" << std::endl;
 			}
-			m_networkModule->run([this](auto raw, auto infos){
-				receiveCallback(std::move(raw), std::move(infos));
+			m_networkModule->run([this](auto const &raw, auto const &infos){
+				receiveCallback(raw, infos);
 			});
 		}
 	}
@@ -161,10 +161,8 @@ namespace zia::core
 		}
 	}
 
-	void	ModuleManager::receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos)
+	void	ModuleManager::receiveCallback(api::Net::Raw const &raw, api::NetInfo const &infos)
 	{
-		std::cout << "OUI\n";
-		return;
 		api::HttpDuplex	duplex = {};
 
 		duplex.info = infos;
@@ -191,6 +189,9 @@ namespace zia::core
 			std::cout << "Error: ";
 			std::cerr << e.what() << '\n' << std::endl;
 			// TODO: Send error 500
+			duplex.resp.version = api::http::Version::http_1_1;
+			duplex.resp.status = api::http::common_status::internal_server_error;
+			duplex.resp.reason = "Internal-Server-Error";
 		}
 		// TODO: duplex.raw_resp = http::toString(duplex.resp);
 		//duplex.raw_resp = api::Net::Raw{std::byte{'Y'}, std::byte{'a'}, std::byte{'y'}};

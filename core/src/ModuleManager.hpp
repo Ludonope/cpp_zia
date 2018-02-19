@@ -42,7 +42,7 @@ namespace zia::core
 		ModuleNameList getModules() const noexcept;
 		ModuleConfList getModuleList(api::ConfArray const &) const noexcept;
 
-		void	receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos);
+		void	receiveCallback(api::Net::Raw const &raw, api::NetInfo const &infos);
 		static void	configureModuleList(ModuleList &list, api::Conf const &conf);
 
 #if defined __linux__
