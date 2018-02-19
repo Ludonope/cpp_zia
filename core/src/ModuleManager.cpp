@@ -93,6 +93,7 @@ namespace zia::core
 							auto const func = m_libs.back().getFunction<api::Module *()>("create");
 							if (func)
 							{
+								m_correspondanceTable[moduleFullPath] = module.substr(3, module.length() - 6);
 								moduleListOutput.push_back({std::unique_ptr<api::Module>(func()), moduleFullPath});
 							}
 						}
@@ -143,7 +144,7 @@ namespace zia::core
 		{
 			try
 			{
-				if (!m_networkModule->config(std::get<api::ConfObject>(m_conf["network"].v)))
+				if (!m_networkModule->config(std::get<api::ConfObject>(m_conf.at("network").v)))
 				{
 					std::cerr << "Error loading network "
 						"module configuration" << std::endl;
@@ -208,10 +209,21 @@ namespace zia::core
 	{
 		for (auto &module : list)
 		{
-			if (!module.first->config(conf))
+			try
 			{
-				std::cerr << "Error loading " <<
-					module.second << " module configuration" << std::endl;
+				auto const configName = m_correspondanceTable.at(module.second);
+				if (!module.first->config(std::get<api::ConfObject>(conf.at(configName).v)))
+				{
+					std::cerr << "Error loading " <<
+						module.second << " module configuration" << std::endl;
+				}
+			}
+			catch (std::exception const &e)
+			{
+				std::cerr << e.what() << std::endl;
+				module.first->config({});
+				std::cerr << "Invalid configuration, loading " << module.second <<
+					" module using default configuration" << std::endl;
 			}
 		}
 	}

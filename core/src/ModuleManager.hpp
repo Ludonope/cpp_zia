@@ -28,12 +28,13 @@ namespace zia::core
 		using ModuleDef = std::pair<std::unique_ptr<api::Module>, std::string>;
 		using ModuleList = std::vector<ModuleDef>;
 		using LibraryList = std::vector<LibLoader>;
-		api::Conf			m_conf;
-		LibraryList			m_libs = {};
-		std::unique_ptr<api::Net>	m_networkModule = nullptr;
-		ModuleList			m_receiveModule = {};
-		ModuleList			m_processingModule = {};
-		ModuleList			m_sendingModule = {};
+		api::Conf				m_conf;
+		LibraryList				m_libs = {};
+		std::unique_ptr<api::Net>		m_networkModule = nullptr;
+		ModuleList				m_receiveModule = {};
+		ModuleList				m_processingModule = {};
+		ModuleList				m_sendingModule = {};
+		std::map<std::string, std::string>	m_correspondanceTable = {};
 
 		void	loadModules() noexcept;
 		using ModuleConfList = std::vector<std::string>;
@@ -43,7 +44,7 @@ namespace zia::core
 		ModuleConfList getModuleList(api::ConfArray const &) const noexcept;
 
 		void	receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos);
-		static void	configureModuleList(ModuleList &list, api::Conf const &conf);
+		void	configureModuleList(ModuleList &list, api::Conf const &conf);
 
 #if defined __linux__
 		static constexpr auto ModulePrefix = "lib";
