@@ -169,7 +169,7 @@ namespace zia::core
 		}
 	}
 
-	void	ModuleManager::receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos)
+	void ModuleManager::receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos)
 	{
 		api::HttpDuplex	duplex = {};
 
@@ -205,7 +205,7 @@ namespace zia::core
 		std::cout << "Done\n";
 	}
 
-	void	ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)
+	void ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)
 	{
 		for (auto &module : list)
 		{
