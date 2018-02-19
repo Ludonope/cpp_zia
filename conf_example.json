@@ -5,5 +5,10 @@
 		"receive": [],
 		"processing": [],
 		"send": []
+	},
+	"network": {
+		"port": 8080,
+		"cert": "./zia.crt",
+		"key": "./zia.key"
 	}
 }

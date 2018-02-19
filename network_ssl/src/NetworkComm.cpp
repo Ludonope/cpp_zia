@@ -1,7 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
-#include <iostream> // TODO: rm
+#include <iostream>
 #include "NetworkComm.hpp"
 
 namespace zia::network
@@ -195,7 +195,6 @@ namespace zia::network
 				clientStatus = (*ite)->handleInput();
 				if (clientStatus != Client::Status::ERR &&
 					(*ite)->hasRequest()) {
-					std::cout << "Found a request !" << std::endl;
 					auto const &raw = (*ite)->getRaw();
 					auto const &infos = (*ite)->getInfos();
 
@@ -205,7 +204,6 @@ namespace zia::network
 			}
 			if (FD_ISSET(sock, &writefds))
 			{
-				std::cout << "Ready to write !" << std::endl;
 				clientStatus = (*ite)->handleOutput();
 			}
 			if (FD_ISSET(sock, &exceptfds))
@@ -272,7 +270,6 @@ namespace zia::network
 #if defined _WIN32
 	void NetworkComm::initWindows() const
 	{
-		std::cout << "Init\n";
 		if (!m_nbSockets && !m_WSAInited)
 		{
 			WSADATA wsa;
@@ -290,7 +287,6 @@ namespace zia::network
 	{
 		if (m_socketSSL != nullptr)
 		{
-			std::cout << "Deinit\n";
 			if (!m_nbSockets)
 			{
 				assert(m_WSAInited == true);

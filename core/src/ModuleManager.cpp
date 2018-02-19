@@ -141,10 +141,18 @@ namespace zia::core
 		configureModuleList(m_sendingModule, m_conf);
 		if (m_networkModule)
 		{
-			if (!m_networkModule->config(m_conf))
+			try
 			{
-				std::cerr << "Error loading network "
-					"module configuration" << std::endl;
+				if (!m_networkModule->config(std::get<api::ConfObject>(m_conf["network"].v)))
+				{
+					std::cerr << "Error loading network "
+						"module configuration" << std::endl;
+				}
+			}
+			catch (std::exception const &)
+			{
+				m_networkModule->config({});
+				std::cerr << "Invalid configuration, loading network using default configuration" << std::endl;
 			}
 			m_networkModule->run([this](auto raw, auto infos){
 				receiveCallback(std::move(raw), std::move(infos));
