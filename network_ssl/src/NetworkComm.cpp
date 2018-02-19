@@ -48,7 +48,6 @@ namespace zia::network
 		}
 		startSSL();
 		++m_nbSockets;
-		std::cout << "Socket: " << m_socket << std::endl;
 	}
 
 	void NetworkComm::startSSL()
@@ -88,7 +87,6 @@ namespace zia::network
 		if (m_socketSSL != nullptr)
 		{
 			--m_nbSockets;
-			std::cout << "Closing socket..." << m_socket << std::endl;
 			SSL_shutdown(m_socketSSL);
 			SSL_free(m_socketSSL);
 			m_socketSSL = nullptr;

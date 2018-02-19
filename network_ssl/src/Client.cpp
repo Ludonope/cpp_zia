@@ -17,7 +17,7 @@ namespace zia::network
 			std::chrono::steady_clock::now(),
 			{
 				sockaddr.sin_addr.s_addr,
-				std::string(inet_ntoa(sockaddr.sin_addr)) // TODO: use inet_ntop() instead for IPV6 support
+				std::string(inet_ntoa(sockaddr.sin_addr))
 			}, ntohs(sockaddr.sin_port), &m_implSocket},
 		m_toSend(),
 		m_buffer(std::make_unique<HttpRingBuffer>())
