@@ -38,13 +38,6 @@ namespace zia::http
 
 		while (lex && !lex.peekIs({ RequestTokenType::CRLF, RequestTokenType::SPACE }))
 		{
-			auto next = lex.next();
-
-			if (next.type == RequestTokenType::UNKNOWN)
-			{
-				throw std::invalid_argument("Invalid token in uri");
-			}
-
 			uri += lex.next().value;
 		}
 
@@ -166,9 +159,9 @@ namespace zia::http
 		return std::string_view(input, size);
 	}
 
-	api::HttpRequest parseRequest(std::byte const *raw)
+	api::HttpRequest parseRequest(api::Net::Raw const &input)
 	{
-		return parseRequest(getHeader(raw));
+		return parseRequest(getHeader(input.data()));
 	}
 
 	api::HttpRequest parseRequest(std::byte const *raw, std::size_t &bodyLen)

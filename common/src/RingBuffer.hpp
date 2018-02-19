@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <array>
 #include <cctype>
@@ -71,6 +72,7 @@ namespace zia
 					}
 					m_data[m_ndxWrite] = data[i];
 					++m_ndxWrite;
+					++m_availableData;
 				}
 			}
 		}
@@ -89,15 +91,32 @@ namespace zia
 					data[i] = m_data[m_ndxRead];
 					m_data[m_ndxRead] = std::byte{'\0'};
 					++m_ndxRead;
+					assert(m_availableData > 0);
+					--m_availableData;
 				}
+			}
+		}
+
+		// Simulate a read
+		void read(std::size_t const len) noexcept
+		{
+			for (std::size_t i = 0; i < len; ++i)
+			{
+				if (m_ndxRead == sizeof(m_data))
+				{
+					m_ndxRead = 0;
+				}
+				m_data[m_ndxRead] = std::byte{'\0'};
+				++m_ndxRead;
+				assert(m_availableData > 0);
+				--m_availableData;
 			}
 		}
 
 		// Get differences of byte between read cursor and write cursor (a.k.a: available datas)
 		inline std::size_t getAvailableData() const noexcept
 		{
-			return (m_ndxWrite > m_ndxRead) ? m_ndxRead :
-				(S - (m_ndxRead - m_ndxWrite));
+			return m_availableData % (S + 1);
 		}
 
 		// Get all the "available data" (see above), without modifying the indexes
@@ -121,5 +140,6 @@ namespace zia
 		std::array<std::byte, S> m_data;
 		std::size_t m_ndxWrite = 0;
 		std::size_t m_ndxRead = 0;
+		std::size_t m_availableData = 0;
 	};
 }

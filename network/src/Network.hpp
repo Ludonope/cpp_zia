@@ -43,6 +43,7 @@ namespace zia::network
 		using sockaddr_t = SOCKADDR;
 		using _in_addr_t = IN_ADDR;
 		using addrinfo_t = struct addrinfo;
+		using ssize_t = SSIZE_T;
 #else
 		using sock_t = int;
 		using sockaddr_in_t = struct sockaddr_in;

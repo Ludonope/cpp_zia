@@ -1,4 +1,6 @@
 #include <cassert>
+#include <cstring>
+#include <iostream>
 #include "HttpRingBuffer.hpp"
 #include "HttpRequestParser.hpp"
 
@@ -38,7 +40,7 @@ namespace zia::network
 			return getHeaderLength() != 0;
 		}
 
-		bool HttpRingBuffer::hasRequest() const noexcept
+		bool HttpRingBuffer::hasRequest() noexcept
 		{
 			auto const headerLength = getHeaderLength();
 			auto rc = true;
@@ -50,14 +52,16 @@ namespace zia::network
 			try
 			{
 				std::size_t contentLength = 0;
-				std::size_t remainingSize = 0;
 				// Datas is guaranted to contain at a double CRLF
 				auto const datas = this->peek();
+				std::cout << (char *)datas.data() << '\n';
 				http::parseRequest(&datas[0], contentLength);
-				rc = (remainingSize >= contentLength);
+				rc = (datas.size() - headerLength) >= contentLength;
 			}
-			catch (std::exception const &)
+			catch (std::exception const &e)
 			{
+				std::cout << e.what() << '\n';
+				this->read(headerLength);
 				rc = false;
 			}
 			return rc;
@@ -72,33 +76,31 @@ namespace zia::network
 			std::size_t bodySize = 0;
 			http::parseRequest(&datas[0], bodySize);
 			auto const totalSize = headerLength + bodySize;
-			request.reserve(totalSize);
+			request.resize(totalSize, {});
 			this->read(&request[0], totalSize);
 			return request;
 		}
 
 		std::size_t HttpRingBuffer::getHeaderLength() const noexcept
 		{
-			auto const carriageReturn = std::byte{0x0D};
-			auto const lineFeed = std::byte{0x0A};
 			std::size_t const max = this->getAvailableData();
 			assert(max < detail::HTTP_BUFFER_SIZE);
-			auto ndx = m_ndxRead;
-
-			while (ndx < max)
+			for (std::size_t i = 0; i < max; ++i)
 			{
-				auto data = RingBuffer::operator[](ndx);
-				auto dataNext = RingBuffer::operator[](ndx + 1);
-				if (data == carriageReturn && (ndx + 3 < max) &&
-					dataNext == lineFeed)
+				if (i + 4u <= max)
 				{
-					data = RingBuffer::operator[](ndx + 2);
-					dataNext = RingBuffer::operator[](ndx + 3);
-					if (data == carriageReturn && dataNext == lineFeed) {
-						return ndx + 3;
+					std::array<std::byte, 5> buff = {};
+					buff[0] = std::byte{RingBuffer::operator[](m_ndxRead + i + 0)};
+					buff[1] = std::byte{RingBuffer::operator[](m_ndxRead + i + 1)};
+					buff[2] = std::byte{RingBuffer::operator[](m_ndxRead + i + 2)};
+					buff[3] = std::byte{RingBuffer::operator[](m_ndxRead + i + 3)};
+					buff[4] = std::byte{0};
+					if (!std::strncmp(reinterpret_cast<char const *>(buff.data()),
+						"\r\n\r\n", 4))
+					{
+						return i + 3 + 1;
 					}
 				}
-				++ndx;
 			}
 			return 0;
 		}

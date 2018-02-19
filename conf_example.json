@@ -1,0 +1,9 @@
+{
+	"modules_path": [".", "./libs", "./modules"],
+	"modules": {
+		"network": "zia_network",
+		"receive": [],
+		"processing": [],
+		"send": []
+	}
+}

@@ -60,6 +60,7 @@ enable_testing()
 
 # Build static libraries
 add_subdirectory(common)
+add_subdirectory(libcrypto)
 
 # Build the core
 add_subdirectory(core)
