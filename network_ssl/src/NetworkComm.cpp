@@ -1,7 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
-#include <iostream> // TODO: rm
+#include <iostream>
 #include "NetworkComm.hpp"
 
 namespace zia::network
@@ -48,7 +48,6 @@ namespace zia::network
 		}
 		startSSL();
 		++m_nbSockets;
-		std::cout << "Socket: " << m_socket << std::endl;
 	}
 
 	void NetworkComm::startSSL()
@@ -88,7 +87,6 @@ namespace zia::network
 		if (m_socketSSL != nullptr)
 		{
 			--m_nbSockets;
-			std::cout << "Closing socket..." << m_socket << std::endl;
 			SSL_shutdown(m_socketSSL);
 			SSL_free(m_socketSSL);
 			m_socketSSL = nullptr;
@@ -195,7 +193,6 @@ namespace zia::network
 				clientStatus = (*ite)->handleInput();
 				if (clientStatus != Client::Status::ERR &&
 					(*ite)->hasRequest()) {
-					std::cout << "Found a request !" << std::endl;
 					auto const &raw = (*ite)->getRaw();
 					auto const &infos = (*ite)->getInfos();
 
@@ -205,7 +202,6 @@ namespace zia::network
 			}
 			if (FD_ISSET(sock, &writefds))
 			{
-				std::cout << "Ready to write !" << std::endl;
 				clientStatus = (*ite)->handleOutput();
 			}
 			if (FD_ISSET(sock, &exceptfds))
@@ -272,7 +268,6 @@ namespace zia::network
 #if defined _WIN32
 	void NetworkComm::initWindows() const
 	{
-		std::cout << "Init\n";
 		if (!m_nbSockets && !m_WSAInited)
 		{
 			WSADATA wsa;
@@ -290,7 +285,6 @@ namespace zia::network
 	{
 		if (m_socketSSL != nullptr)
 		{
-			std::cout << "Deinit\n";
 			if (!m_nbSockets)
 			{
 				assert(m_WSAInited == true);

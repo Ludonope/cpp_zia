@@ -1,4 +1,4 @@
-#include <iostream> // TODO: rm ?
+#include <iostream>
 #include "NetworkImpl.hpp"
 #include "NetworkComm.hpp"
 
@@ -15,12 +15,18 @@ namespace zia::network
 
 	bool NetworkImpl::config(zia::api::Conf const & conf)
 	{
-		// TODO
-		if (m_port == 0)
+		bool success = true;
+		try
 		{
+			m_port = std::get<long long>(conf.at("port").v);
+		}
+		catch (std::exception const &e)
+		{
+			std::cerr << e.what() << std::endl;
+			success = false;
 			m_port = 8080; // Default port value
 		}
-		return false;
+		return success;
 	}
 
 	bool NetworkImpl::run(zia::api::Net::Callback cb)
@@ -35,7 +41,7 @@ namespace zia::network
 			m_thread = std::make_unique<std::thread>(
 				[comm = std::move(netComm), this]() mutable {
 					this->execute(std::move(comm)); 
-				}
+			}
 			);
 			m_running = true;
 		}

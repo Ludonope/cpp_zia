@@ -41,6 +41,7 @@ namespace zia::http
 		{
 			os << header << ": " << value << "\r\n";
 		}
+		os << "\r\n";
 
 		auto data = reinterpret_cast<char const *>(res.body.data());
 		auto body = std::string_view(data, res.body.size());

@@ -1,7 +1,6 @@
 #include <cassert>
 #include <algorithm>
 #include <stdexcept>
-#include <iostream> // TODO: rm
 #include "NetworkComm.hpp"
 
 namespace zia::network
@@ -37,14 +36,12 @@ namespace zia::network
 		{
 			throw std::runtime_error("Cannot listen on socket");
 		}
-		std::cout << "Socket: " << m_socket << std::endl;
 	}
 
 	NetworkComm::~NetworkComm()
 	{
 		if (m_socket != -1)
 		{
-			std::cout << "Closing socket..." << m_socket << std::endl;
 			closesocket(m_socket);
 			m_socket = -1;
 		}
@@ -104,8 +101,10 @@ namespace zia::network
 					fd_max = sock;
 				}
 			}
+			struct timeval tv = {};
+			tv.tv_usec = 50;
 			rc = select(fd_max + 1, &readfds, &writefds,
-				&exceptfds, nullptr);
+				&exceptfds, &tv);
 		} while (rc == -1 && errno == EINTR);
 		return rc;
 	}
@@ -128,7 +127,6 @@ namespace zia::network
 				clientStatus = (*ite)->handleInput();
 				if (clientStatus != Client::Status::ERR &&
 					(*ite)->hasRequest()) {
-					std::cout << "Found a request !" << std::endl;
 					auto const &raw = (*ite)->getRaw();
 					auto const &infos = (*ite)->getInfos();
 
@@ -138,7 +136,6 @@ namespace zia::network
 			}
 			if (FD_ISSET(sock, &writefds))
 			{
-				std::cout << "Ready to write !" << std::endl;
 				clientStatus = (*ite)->handleOutput();
 			}
 			if (FD_ISSET(sock, &exceptfds))
@@ -191,7 +188,6 @@ namespace zia::network
 #if defined _WIN32
 	void NetworkComm::initWindows() const
 	{
-		std::cout << "Init\n";
 		if (!m_nbSockets && !m_WSAInited)
 		{
 			WSADATA wsa;
@@ -210,7 +206,6 @@ namespace zia::network
 	{
 		if (m_socket != -1)
 		{
-			std::cout << "Deinit\n";
 			--m_nbSockets;
 			if (!m_nbSockets)
 			{

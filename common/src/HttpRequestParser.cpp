@@ -146,10 +146,15 @@ namespace zia::http
 	static std::string_view getHeader(std::byte const *raw)
 	{
 		auto input = reinterpret_cast<char const *>(raw);
+		if (input == nullptr)
+		{
+			return std::string_view(nullptr, 0);
+		}
+
 		std::size_t size = 0;
 
 		// Loop until we hit the double CRLF
-		while (std::strncmp(&input[size], "\r\n\r\n", 4))
+		while (&input[size] && std::strncmp(&input[size], "\r\n\r\n", 4))
 		{
 			++size;
 		}

@@ -94,6 +94,7 @@ namespace zia::core
 							auto const func = m_libs.back().getFunction<api::Module *()>("create");
 							if (func)
 							{
+								m_correspondanceTable[moduleFullPath] = module.substr(3, module.length() - 6);
 								moduleListOutput.push_back({std::unique_ptr<api::Module>(func()), moduleFullPath});
 							}
 						}
@@ -142,13 +143,21 @@ namespace zia::core
 		configureModuleList(m_sendingModule, m_conf);
 		if (m_networkModule)
 		{
-			if (!m_networkModule->config(m_conf))
+			try
 			{
-				std::cerr << "Error loading network "
-					"module configuration" << std::endl;
+				if (!m_networkModule->config(std::get<api::ConfObject>(m_conf.at("network").v)))
+				{
+					std::cerr << "Error loading network "
+						"module configuration" << std::endl;
+				}
 			}
-			m_networkModule->run([this](auto const &raw, auto const &infos){
-				receiveCallback(raw, infos);
+			catch (std::exception const &)
+			{
+				m_networkModule->config({});
+				std::cerr << "Invalid configuration, loading network using default configuration" << std::endl;
+			}
+			m_networkModule->run([this](auto raw, auto infos){
+				receiveCallback(std::move(raw), std::move(infos));
 			});
 		}
 	}
@@ -161,18 +170,16 @@ namespace zia::core
 		}
 	}
 
-	void	ModuleManager::receiveCallback(api::Net::Raw const &raw, api::NetInfo const &infos)
+	void ModuleManager::receiveCallback(api::Net::Raw &&raw, api::NetInfo &&infos)
 	{
 		api::HttpDuplex	duplex = {};
 
-		duplex.info = infos;
-		duplex.raw_req = raw;
+		duplex.info = std::move(infos);
+		duplex.raw_req = std::move(raw);
 
 		try
 		{
-			std::cout << "Parsing request\n";
-			duplex.req = http::parseRequest(raw);
-			std::cout << "Request parsed\n";
+			duplex.req = http::parseRequest(duplex.raw_req);
 			auto const moduleProcess = [&](ModuleList &list){
 				for (auto &module : list)
 				{
@@ -182,7 +189,6 @@ namespace zia::core
 			moduleProcess(m_receiveModule);
 			moduleProcess(m_processingModule);
 			moduleProcess(m_sendingModule);
-			std::cout << "Execution over\n";
 		}
 		catch (std::exception const &e)
 		{
@@ -193,23 +199,29 @@ namespace zia::core
 			duplex.resp.status = api::http::common_status::internal_server_error;
 			duplex.resp.reason = "Internal-Server-Error";
 		}
-		// TODO: duplex.raw_resp = http::toString(duplex.resp);
-		//duplex.raw_resp = api::Net::Raw{std::byte{'Y'}, std::byte{'a'}, std::byte{'y'}};
-		std::cout << http::responseToString(duplex.resp);
 		duplex.raw_resp = http::responseToRaw(duplex.resp);
-		std::cout << "Sending response\n";
-		m_networkModule->send(infos.sock, duplex.raw_resp);
-		std::cout << "Done\n";
+		m_networkModule->send(duplex.info.sock, duplex.raw_resp);
 	}
 
-	void	ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)
+	void ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)
 	{
 		for (auto &module : list)
 		{
-			if (!module.first->config(conf))
+			try
 			{
-				std::cerr << "Error loading " <<
-					module.second << " module configuration" << std::endl;
+				auto const configName = m_correspondanceTable.at(module.second);
+				if (!module.first->config(std::get<api::ConfObject>(conf.at(configName).v)))
+				{
+					std::cerr << "Error loading " <<
+						module.second << " module configuration" << std::endl;
+				}
+			}
+			catch (std::exception const &e)
+			{
+				std::cerr << e.what() << std::endl;
+				module.first->config({});
+				std::cerr << "Invalid configuration, loading " << module.second <<
+					" module using default configuration" << std::endl;
 			}
 		}
 	}

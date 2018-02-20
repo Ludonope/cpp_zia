@@ -53,9 +53,15 @@ namespace zia::core
 		modulesLists["processing"] = api::ConfValue{api::ConfArray{api::ConfValue{std::string{"zia_php"}}}};
 		modulesLists["send"] = api::ConfValue{api::ConfArray{}};
 
+		api::ConfObject networkConfiguration = {};
+		networkConfiguration["port"] = api::ConfValue{8080ll};
+		networkConfiguration["cert"] = api::ConfValue{std::string{"./zia.crt"}};
+		networkConfiguration["key"] = api::ConfValue{std::string{"./zia.key"}};
+
 		m_config = api::ConfObject{};
 		m_config["modules_path"] = api::ConfValue{modulesPath};
 		m_config["modules"] = api::ConfValue{modulesLists};
+		m_config["network"] = api::ConfValue{networkConfiguration};
 #endif
 		// TODO: Implement and fill m_config
 		m_hash = getHash();

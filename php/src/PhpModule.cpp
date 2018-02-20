@@ -81,22 +81,19 @@ namespace zia::php
 
 		auto ret = pclose(iopipe);
 
-		std::cout << "Command output: " << ret << '\n';
-
 		if (ret == 0)
 		{
 			auto body = os.str();
 			
-			std::cout << "Content: \n" << body << "\n\n";
-
 			res.body.clear();
 			res.body.resize(body.length());
 
-			std::memcpy(res.body.data(), body.data(), body.length());
-			res.headers["Content-Length"] = std::to_string(body.length());
 			res.version = api::http::Version::http_1_1;
 			res.status = api::http::common_status::ok;
 			res.reason = "OK";
+			res.headers["Content-Length"] = std::to_string(body.length());
+			res.headers["Content-Type"] = "text/html; charset=UTF-8";
+			std::memcpy(res.body.data(), body.data(), body.length());
 		}
 
 		return ret == 0;
