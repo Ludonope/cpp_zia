@@ -94,7 +94,11 @@ namespace zia::core
 							auto const func = m_libs.back().getFunction<api::Module *()>("create");
 							if (func)
 							{
+#if _WIN32
+								m_correspondanceTable[moduleFullPath] = module.substr(0, module.length() - 4);
+#else
 								m_correspondanceTable[moduleFullPath] = module.substr(3, module.length() - 6);
+#endif
 								moduleListOutput.push_back({std::unique_ptr<api::Module>(func()), moduleFullPath});
 							}
 						}
@@ -194,7 +198,6 @@ namespace zia::core
 		{
 			std::cout << "Error: ";
 			std::cerr << e.what() << '\n' << std::endl;
-			// TODO: Send error 500
 			duplex.resp.version = api::http::Version::http_1_1;
 			duplex.resp.status = api::http::common_status::internal_server_error;
 			duplex.resp.reason = "Internal-Server-Error";

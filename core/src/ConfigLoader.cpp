@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include "ConfigLoader.hpp"
+#include "ConfigParser.hpp"
 
 namespace zia::core
 {
@@ -40,30 +41,23 @@ namespace zia::core
 
 	void ConfigLoader::load()
 	{
-#if 1
-		// Mock datas
-		api::ConfArray const modulesPath = {
-			api::ConfValue{std::string{"."}},
-			api::ConfValue{std::string{"./libs"}},
-			api::ConfValue{std::string{"./modules"}}
-		};
-		api::ConfObject modulesLists = {};
-		modulesLists["network"] = api::ConfValue{std::string{"zia_network"}};
-		modulesLists["receive"] = api::ConfValue{api::ConfArray{}};
-		modulesLists["processing"] = api::ConfValue{api::ConfArray{api::ConfValue{std::string{"zia_php"}}}};
-		modulesLists["send"] = api::ConfValue{api::ConfArray{}};
+		try
+		{
+			std::ifstream file(m_filename.c_str());
+			if (!file.good() && !file.is_open()) {
+				throw std::invalid_argument("Cannot open the configuration file");
+			}
+			std::stringstream buffer;
 
-		api::ConfObject networkConfiguration = {};
-		networkConfiguration["port"] = api::ConfValue{8080ll};
-		networkConfiguration["cert"] = api::ConfValue{std::string{"./zia.crt"}};
-		networkConfiguration["key"] = api::ConfValue{std::string{"./zia.key"}};
+			buffer << file.rdbuf();
 
-		m_config = api::ConfObject{};
-		m_config["modules_path"] = api::ConfValue{modulesPath};
-		m_config["modules"] = api::ConfValue{modulesLists};
-		m_config["network"] = api::ConfValue{networkConfiguration};
-#endif
-		// TODO: Implement and fill m_config
+			m_config = conf::parseConf(buffer.str());
+		}
+		catch (std::exception const &e)
+		{
+			std::cerr << "Failed to load the configuration file '" << m_filename << "':\n"
+				<< e.what() << std::endl;
+		}
 		m_hash = getHash();
 	}
 

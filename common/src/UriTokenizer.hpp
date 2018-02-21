@@ -26,7 +26,7 @@ namespace zia::http
 		}
 
 	private:
-		void add(UriTokenType type);
+		void add(UriTokenType);
 
 		std::size_t m_cursor = 0;
 		std::string_view m_input;

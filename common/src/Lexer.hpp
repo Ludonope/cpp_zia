@@ -4,6 +4,7 @@
 #include "Token.hpp"
 #include "RequestTokenizer.hpp"
 #include "UriTokenizer.hpp"
+#include "ConfigTokenizer.hpp"
 
 namespace zia::http
 {
@@ -101,4 +102,5 @@ namespace zia::http
 
 	using RequestLexer = Lexer<RequestTokenizer, ReqToken>;
 	using UriLexer = Lexer<UriTokenizer, UriToken>;
+	using ConfLexer = Lexer<ConfigTokenizer, ConfigToken>;
 }

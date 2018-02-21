@@ -3,12 +3,13 @@
 	"modules": {
 		"network": "zia_network",
 		"receive": [],
-		"processing": [],
+    "processing": [ "zia_php" ],
 		"send": []
 	},
-	"network": {
-		"port": 8080,
-		"cert": "./zia.crt",
-		"key": "./zia.key"
-	}
+  "network": {
+    "port": 8080,
+    "cert": "./zia.crt",
+    "key": "./zia.key"
+  },
+  "zia_php": {}
 }

@@ -3,7 +3,7 @@
 #include <string_view>
 #include <vector>
 
-namespace zia::http
+namespace zia
 {
 	enum class RequestTokenType
 	{
@@ -42,6 +42,22 @@ namespace zia::http
 		ID
 	};
 
+	enum class ConfigTokenType
+	{
+		END_OF_FILE,
+		OPEN_BRACE,
+		CLOSE_BRACE,
+		OPEN_BRACKET,
+		CLOSE_BRACKET,
+		COLON,
+		COMMA,
+		STRING_LITERAL,
+		NUMBER,
+		DOUBLE,
+		BOOLEAN,
+		UNKNOWN
+	};
+
 	template <typename _Type>
 	struct Token
 	{
@@ -69,4 +85,5 @@ namespace zia::http
 
 	using ReqToken = Token<RequestTokenType>;
 	using UriToken = Token<UriTokenType>;
+	using ConfigToken = Token<ConfigTokenType>;
 }

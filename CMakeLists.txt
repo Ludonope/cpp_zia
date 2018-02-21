@@ -8,7 +8,8 @@ HunterGate(
 	SHA1 "820996fcbb96b07684955e053d2be3eee8538183"
 )
 
-project(cpp_rtype)
+project(cpp_zia)
+#set(CMAKE_BUILD_TYPE Debug)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
@@ -54,6 +55,7 @@ if (UNIX)
 	hunter_add_package(GTest)
 	hunter_add_package(benchmark)
 endif()
+
 hunter_add_package(OpenSSL)
 find_package(Sanitizers)
 enable_testing()
