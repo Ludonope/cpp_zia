@@ -129,6 +129,40 @@ namespace zia::http
 		return ss.str();
 	}
 
+	std::string Uri::decode(std::string_view s)
+	{
+		auto str = std::string();
+		auto val = std::string();
+		auto percent = 0;
+
+		str.reserve(s.length());
+		val.reserve(3);
+
+		for (char c : s)
+		{
+			if (percent > 1)
+			{
+				val += c;
+				--percent;
+			}
+			else if (percent == 1)
+			{
+				str += static_cast<char>(std::stoi(val, nullptr, 16));
+				--percent;
+			}
+			else if (c == '%')
+			{
+				percent = 3;
+			}
+			else
+			{
+				str += c;
+			}
+		}
+
+		return str;
+	}
+
 	void Uri::parseHostGroup(UriLexer &lex)
 	{
 		lex.next();
@@ -155,13 +189,20 @@ namespace zia::http
 
 	void Uri::normalizeAll()
 	{
-		this->normalize(m_scheme);
-		this->normalize(m_user);
-		this->normalize(m_password);
-		this->normalize(m_host);
-		this->normalize(m_path, true);
-		this->normalize(m_query, true);
-		this->normalize(m_fragment, true);
+		normalize(m_scheme);
+		normalize(m_user);
+		normalize(m_password);
+		normalize(m_host);
+		normalize(m_path, true);
+		normalize(m_query, true);
+		normalize(m_fragment, true);
+
+		decodeValue(m_scheme);
+		decodeValue(m_user);
+		decodeValue(m_password);
+		decodeValue(m_host);
+		decodeValue(m_path);
+		decodeValue(m_fragment);
 	}
 
 	void Uri::normalize(std::string &e, bool percentOnly)
@@ -197,5 +238,10 @@ namespace zia::http
 		m_path.clear();
 		m_query.clear();
 		m_fragment.clear();
+	}
+
+	void Uri::decodeValue(std::string &s)
+	{
+		s = decode(s);
 	}
 }

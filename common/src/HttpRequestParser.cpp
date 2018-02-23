@@ -41,8 +41,6 @@ namespace zia::http
 			uri += lex.next().value;
 		}
 
-		// TODO: decode the uri (ex: "yolo.com/s?hello%20world" -> "yolo.com/s?hello world")
-
 		return uri;
 	}
 

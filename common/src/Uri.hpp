@@ -44,11 +44,14 @@ namespace zia::http
 		void setQuery(std::string_view query)		{ m_query = query; }
 		void setFragment(std::string_view fragment) { m_fragment = fragment; }
 
+		static std::string decode(std::string_view s);
+
 	private:
 		void parseHostGroup(UriLexer &lex);
 		void normalizeAll();
-		void normalize(std::string &e, bool percentOnly = false);
+		static void normalize(std::string &e, bool percentOnly = false);
 		void clear();
+		static void decodeValue(std::string &s);
 
 		std::string m_scheme = "";
 		std::string m_user = "";
