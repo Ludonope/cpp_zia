@@ -4,6 +4,7 @@
 #include "Network.hpp"
 #include "ImplSocket.hpp"
 #include "HttpRingBuffer.hpp"
+#include "Timer.hpp"
 #include <queue>
 #include <memory>
 
@@ -38,8 +39,7 @@ namespace zia::network {
 
 		inline bool hasTimedOut() const noexcept
 		{
-			// TODO
-			return false;
+			return m_aliveTimer.check();
 		}
 
 		inline zia::api::NetInfo const &getInfos() const noexcept
@@ -70,6 +70,7 @@ namespace zia::network {
 		zia::api::NetInfo			m_infos;
 		std::queue<api::Net::Raw>		m_toSend;
 		std::unique_ptr<HttpRingBuffer>		m_buffer;
+		mutable Timer<std::chrono::seconds>	m_aliveTimer = 120;
 
 		static constexpr auto READ_SIZE = 4096;
 		static_assert(READ_SIZE <= detail::HTTP_BUFFER_SIZE);
