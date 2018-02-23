@@ -184,15 +184,6 @@ namespace zia::core
 		try
 		{
 			duplex.req = http::parseRequest(duplex.raw_req);
-			auto const moduleProcess = [&](ModuleList &list){
-				for (auto &module : list)
-				{
-					module.first->exec(duplex);
-				}
-			};
-			moduleProcess(m_receiveModule);
-			moduleProcess(m_processingModule);
-			moduleProcess(m_sendingModule);
 		}
 		catch (std::exception const &e)
 		{
@@ -202,8 +193,39 @@ namespace zia::core
 			duplex.resp.status = api::http::common_status::internal_server_error;
 			duplex.resp.reason = "Internal-Server-Error";
 		}
+		auto const moduleProcess = [&](ModuleList &list, bool mustBreak = false) {
+			auto done = false;
+
+			for (auto &module : list)
+			{
+				try
+				{
+					done = module.first->exec(duplex) || done;
+					if (mustBreak && done)
+					{
+						return true;
+					}
+				}
+				catch (std::exception const &e)
+				{
+					std::cerr << "Error: " << e.what() << '\n';
+				}
+			}
+			return done;
+		};
+
+		moduleProcess(m_receiveModule);
+		if (!moduleProcess(m_processingModule, true))
+		{
+			duplex.resp.version = api::http::Version::http_1_1;
+			duplex.resp.status = api::http::common_status::not_implemented;
+			duplex.resp.reason = "Not-Implemented";
+		}
+		moduleProcess(m_sendingModule);
+	
 		duplex.raw_resp = http::responseToRaw(duplex.resp);
 		m_networkModule->send(duplex.info.sock, duplex.raw_resp);
+		std::cout << "Request DONE" << std::endl;
 	}
 
 	void ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)

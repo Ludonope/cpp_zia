@@ -1,5 +1,6 @@
 #include <exception>
 #include "PhpQuery.hpp"
+#include "Uri.hpp"
 
 namespace zia::php
 {
@@ -25,7 +26,7 @@ namespace zia::php
 					std::invalid_argument("Empty parameter name in php query");
 				}
 				isParam = true;
-				self[param] = value;
+				self[http::Uri::decode(param)] = http::Uri::decode(value);
 				param = "";
 				value = "";
 			}

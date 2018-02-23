@@ -9,8 +9,6 @@
 #include "Uri.hpp"
 #include "PhpQuery.hpp"
 
-#include <iostream> // TODO: remove
-
 #if defined _WIN32
 #define popen _popen
 #define pclose _pclose
@@ -33,9 +31,6 @@ namespace zia::php
 		auto uri = http::Uri(http.req.uri);
 		auto path = std::string_view(uri.path());
 
-		std::cout << "Path: " << path << '\n';
-		std::cout << "Uri parsed: " << uri.toString() << '\n';
-
 		// Check each valid php file extension
 		for (auto ext : valid)
 		{
@@ -44,7 +39,6 @@ namespace zia::php
 
 			if (sub == ext)
 			{
-				std::cout << "Php file extension: " << ext << '\n';
 				return this->executeRequest(http.resp, uri);
 			}
 		}
@@ -54,22 +48,26 @@ namespace zia::php
 
 	bool PhpModule::executeRequest(api::HttpResponse &res, http::Uri const &uri)
 	{
-		auto command = "php-cgi -f "s + std::quoted(uri.path())._Ptr;
 		char psBuffer[4096];
 		FILE *iopipe;
 		std::ostringstream os;
 		auto query = PhpQuery(uri.query());
 
+		os << "php-cgi -f " << std::quoted(uri.path());
+
 		for (auto const &[param, value] : query)
 		{
-			command += " \"" + param + '=' + value + '"';
+			os << ' ' << std::quoted(param + '=' + value);
 		}
 
 		//command = "echo %cd%";
-		std::cout << "Command: " << command << '\n';
+		auto command = os.str();
 
 		if ((iopipe = popen(command.c_str(), "r")) == nullptr)
 			return false;
+
+		os.str("");
+		os.clear();
 
 		while (!feof(iopipe))
 		{
