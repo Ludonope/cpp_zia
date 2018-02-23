@@ -1,6 +1,16 @@
-#include "gtest/gtest.h"
+#if defined __clang__
+#pragma clang diagnostic ignored "-Wkeyword-macro"
+#endif
 
-TEST(RequestParser, DummyTest)
+#include "gtest/gtest.h"
+#include "HttpRequestParser.hpp"
+
+TEST(RequestParser, RequestParser_Simple_Valid)
 {
-	ASSERT_EQ(1, 1);
+	auto input = "GET /path HTTP/1.1\r\n\r\n";
+	auto req = zia::http::parseRequest(input);
+
+	ASSERT_EQ(req.version, zia::api::http::Version::http_1_1);
+	ASSERT_EQ(req.method, zia::api::http::Method::get);
+	ASSERT_EQ(req.uri, "/path");
 }

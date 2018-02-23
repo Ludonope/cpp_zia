@@ -3,7 +3,7 @@
 	"modules": {
 		"network": "zia_network",
 		"receive": [],
-    "processing": [ "zia_php" ],
+    "processing": [ "zia_php", "zia_getfile" ],
 		"send": []
 	},
   "network": {
@@ -11,5 +11,6 @@
     "cert": "./zia.crt",
     "key": "./zia.key"
   },
-  "zia_php": {}
+  "zia_php": {},
+  "zia_getfile": {}
 }
