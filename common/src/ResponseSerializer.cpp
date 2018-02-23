@@ -1,4 +1,5 @@
 #include <sstream>
+#include <cstring>
 #include "ResponseSerializer.hpp"
 
 namespace zia::http

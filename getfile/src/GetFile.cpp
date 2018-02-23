@@ -5,6 +5,11 @@
 #include "GetFile.hpp"
 #include "Uri.hpp"
 
+// Evil hack to make this code work on Windows
+#if defined _WIN32
+#define stat _stat
+#endif
+
 namespace zia
 {
 	bool GetFile::config(api::Conf const &conf)
@@ -23,9 +28,9 @@ namespace zia
 		auto &res = http.resp;
 		auto uri = http::Uri(http.req.uri);
 		auto file = uri.path();
-		struct _stat st;
+		struct stat st;
 
-		if (_stat(file.c_str(), &st) != 0)
+		if (stat(file.c_str(), &st) != 0)
 		{
 			res.version = api::http::Version::http_1_1;
 			res.status = api::http::common_status::not_found;

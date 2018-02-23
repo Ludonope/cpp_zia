@@ -4,7 +4,7 @@
 
 namespace zia::conf
 {
-	api::ConfValue parseConfValue(http::ConfLexer &lex);
+	static api::ConfValue parseConfValue(http::ConfLexer &lex);
 
 	static std::string destringify(std::string_view s)
 	{

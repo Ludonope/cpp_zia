@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <vector>
+#include <cstring>
 #include "Token.hpp"
 
 namespace zia::http
