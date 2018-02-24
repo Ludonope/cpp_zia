@@ -60,8 +60,6 @@ namespace zia::http
 			m_fragment = lex.nextChecked(UriTokenType::ID, "Expected a fragment after the hash").value;
 		}
 
-		std::cout << "Token: '" << lex.peek().value << "', '" << lex.peek(1).value << "'" << std::endl;
-
 		lex.nextChecked(UriTokenType::END_OF_FILE, "Unexpected content at the end of the uri");
 
 		this->normalizeAll();
