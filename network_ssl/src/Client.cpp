@@ -54,6 +54,7 @@ namespace zia::network
 		{
 			rc = SSL_read(sock, reinterpret_cast<char *>(buffer.data()), buffer.size() - 1);
 		} while (rc == -1 && errno == EINTR);
+		m_aliveTimer.reset();
 		if (rc == 0)
 		{
 			return Status::DONE;
@@ -84,15 +85,18 @@ namespace zia::network
 			} while (rc == -1 && errno == EINTR);
 			if (rc == 0)
 			{
+				m_aliveTimer.reset();
 				return Status::DONE;
 			}
 			else if (rc == -1)
 			{
+				m_aliveTimer.reset();
 				return Status::ERR;
 			}
 			sizeSent += rc;
 		}
 		m_toSend.pop();
+		m_aliveTimer.reset();
 		return Status::OK;
 	}
 }
