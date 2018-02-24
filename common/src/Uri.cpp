@@ -2,7 +2,7 @@
 #include <cctype>
 #include "Uri.hpp"
 #include "Lexer.hpp"
-#include <iostream>
+
 namespace zia::http
 {
 	Uri::Uri(std::string_view uri)
