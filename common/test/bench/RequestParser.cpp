@@ -1,7 +1,6 @@
 #include <benchmark/benchmark.h>
 #include <cstring>
 #include "HttpRequestParser.hpp"
-#include <iostream>
 
 static void BM_HttpRequestParser_VeryShortRequest(benchmark::State& state) {
 	auto input = "GET / HTTP/1.1\r\n\r\n";
