@@ -41,7 +41,6 @@ namespace zia::http
 
 	ReqToken RequestTokenizer::parsePunc()
 	{
-		auto begin = m_cursor;
 		static constexpr std::array<std::pair<const char *, RequestTokenType>, 19> data{{
 			{ "\r\n", RequestTokenType::CRLF },
 			{ " ", RequestTokenType::SPACE },

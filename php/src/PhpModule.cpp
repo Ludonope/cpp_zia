@@ -18,7 +18,7 @@ using std::operator""s;
 
 namespace zia::php
 {
-	bool PhpModule::config(api::Conf const &conf)
+	bool PhpModule::config(api::Conf const &)
 	{
 		return true;
 	}

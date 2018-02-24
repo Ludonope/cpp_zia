@@ -12,7 +12,7 @@
 
 namespace zia
 {
-	bool GetFile::config(api::Conf const &conf)
+	bool GetFile::config(api::Conf const &)
 	{
 		return true;
 	}
