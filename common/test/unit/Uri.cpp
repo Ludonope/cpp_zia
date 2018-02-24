@@ -5,6 +5,22 @@
 #include "gtest/gtest.h"
 #include "Uri.hpp"
 
+TEST(Uri, EmptyUri)
+{
+	auto str = "";
+	auto uri = zia::http::Uri(str);
+
+	ASSERT_EQ(uri.path(), "");
+}
+
+TEST(Uri, OneSlashPath)
+{
+	auto str = "/";
+	auto uri = zia::http::Uri(str);
+
+	ASSERT_EQ(uri.path(), "");
+}
+
 TEST(Uri, BasicUriParsing)
 {
 	auto str = "http://ludonope.com/search.php?s=hello";
