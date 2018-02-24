@@ -2,7 +2,7 @@
 #include <cctype>
 #include "Uri.hpp"
 #include "Lexer.hpp"
-
+#include <iostream>
 namespace zia::http
 {
 	Uri::Uri(std::string_view uri)
@@ -29,7 +29,7 @@ namespace zia::http
 			{
 				m_scheme = lex.next().value;
 			}
-
+			lex.next();
 			if (lex.peekIs({ UriTokenType::SLASH }) && lex.peekIs({ UriTokenType::SLASH }, 1))
 			{
 				this->parseHostGroup(lex);
@@ -57,8 +57,10 @@ namespace zia::http
 		if (lex.peekIs({ UriTokenType::HASH }))
 		{
 			lex.next();
-			m_query = lex.nextChecked(UriTokenType::ID, "Expected a fragment after the hash").value;
+			m_fragment = lex.nextChecked(UriTokenType::ID, "Expected a fragment after the hash").value;
 		}
+
+		std::cout << "Token: '" << lex.peek().value << "', '" << lex.peek(1).value << "'" << std::endl;
 
 		lex.nextChecked(UriTokenType::END_OF_FILE, "Unexpected content at the end of the uri");
 
@@ -148,6 +150,7 @@ namespace zia::http
 			else if (percent == 1)
 			{
 				str += static_cast<char>(std::stoi(val, nullptr, 16));
+				str += c;
 				--percent;
 			}
 			else if (c == '%')
