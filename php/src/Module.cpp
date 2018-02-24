@@ -1,4 +1,4 @@
-#include "api/Module.h"
+#include "api/module.h"
 #include "PhpModule.hpp"
 
 #if defined _WIN32

@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.7)
-
 # General configuration
 set(LIB_ZIA_CRYPTO zia_crypto)
 
