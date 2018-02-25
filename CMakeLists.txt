@@ -42,7 +42,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} /std:c++17 /W3")
     set(CMAKE_CXX_FLAGS_DEBUG   "/Od /MDd /Zi /D DEBUG /D _DEBUG")
-    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD /D NDEBUG")
+    set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MDd /D NDEBUG")
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
@@ -54,6 +54,10 @@ endif()
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+configure_file("conf_example.json" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COPYONLY)
+configure_file("zia.crt" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COPYONLY)
+configure_file("zia.key" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} COPYONLY)
 
 # Get dependencies
 if (UNIX)
@@ -74,6 +78,7 @@ add_subdirectory(core)
 
 # Build the modules
 add_subdirectory(autoindex)
+add_subdirectory(custom_root)
 add_subdirectory(network)
 add_subdirectory(network_ssl)
 add_subdirectory(php)

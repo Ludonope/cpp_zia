@@ -193,17 +193,14 @@ namespace zia::core
 			duplex.resp.status = api::http::common_status::internal_server_error;
 			duplex.resp.reason = "Internal-Server-Error";
 		}
-		auto const moduleProcess = [&](ModuleList &list, bool mustBreak = false) {
-			auto done = false;
-
+		auto const moduleProcess = [&](ModuleList &list, bool breakOn) {
 			for (auto &module : list)
 			{
 				try
 				{
-					done = module.first->exec(duplex) || done;
-					if (mustBreak && done)
+					if (module.first->exec(duplex) == breakOn)
 					{
-						return true;
+						return breakOn;
 					}
 				}
 				catch (std::exception const &e)
@@ -211,18 +208,34 @@ namespace zia::core
 					std::cerr << "Error: " << e.what() << '\n';
 				}
 			}
-			return done;
+			return !breakOn;
 		};
+		bool done = false;
 
-		moduleProcess(m_receiveModule);
-		if (!moduleProcess(m_processingModule, true))
+		std::cout << "Debug " << 1 << std::endl;
+		if (moduleProcess(m_receiveModule, false) == false)
 		{
+			std::cout << "Debug " << 2 << std::endl;
+			done = true;
+		}
+
+		std::cout << "Debug " << 3 << std::endl;
+		if (!done && moduleProcess(m_processingModule, true) == false)
+		{
+			std::cout << "Debug " << 4 << std::endl;
 			duplex.resp.version = api::http::Version::http_1_1;
 			duplex.resp.status = api::http::common_status::not_implemented;
 			duplex.resp.reason = "Not-Implemented";
+			done = true;
 		}
-		moduleProcess(m_sendingModule);
-	
+		std::cout << "Debug " << 5 << std::endl;
+		if (!done)
+		{
+			std::cout << "Debug " << 6 << std::endl;
+			moduleProcess(m_sendingModule, false);
+		}
+		std::cout << "Debug " << 7 << std::endl;
+
 		duplex.raw_resp = http::responseToRaw(duplex.resp);
 		m_networkModule->send(duplex.info.sock, duplex.raw_resp);
 	}

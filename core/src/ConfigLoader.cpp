@@ -43,13 +43,15 @@ namespace zia::core
 	{
 		try
 		{
+			std::cout << "Opening: " << m_filename << std::endl;
+			std::stringstream buffer;
 			std::ifstream file(m_filename.c_str());
-			if (!file.good() && !file.is_open()) {
+
+			if (!file.good() || !file.is_open()) {
 				throw std::invalid_argument("Cannot open the configuration file");
 			}
-			std::stringstream buffer;
 
-			buffer << file.rdbuf();
+			buffer << file.rdbuf() << std::flush;
 
 			m_config = conf::parseConf(buffer.str());
 		}

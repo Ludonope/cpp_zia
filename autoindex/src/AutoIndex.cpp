@@ -58,6 +58,6 @@ namespace zia
 
 		}
 
-		return false;
+		return true;
 	}
 }

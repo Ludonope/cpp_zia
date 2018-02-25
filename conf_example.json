@@ -2,7 +2,7 @@
 	"modules_path": [".", "./libs", "./modules"],
   "modules": {
     "network": "zia_network",
-    "receive": [ "zia_autoindex" ],
+    "receive": [ "zia_custom_root", "zia_autoindex" ],
     "processing": [ "zia_php", "zia_getfile" ],
     "send": []
   },
@@ -10,6 +10,9 @@
     "port": 80,
     "cert": "./zia.crt",
     "key": "./zia.key"
+  },
+  "zia_custom_root": {
+    "root": "../../www/"
   },
   "zia_autoindex": {
     "default_files": [ "index.html", "index.php" ]
