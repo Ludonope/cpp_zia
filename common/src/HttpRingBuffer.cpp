@@ -54,7 +54,6 @@ namespace zia::network
 				std::size_t contentLength = 0;
 				// Datas is guaranted to contain at a double CRLF
 				auto const datas = this->peek();
-				std::cout << (char *)datas.data() << '\n';
 				http::parseRequest(&datas[0], contentLength);
 				rc = (datas.size() - headerLength) >= contentLength;
 			}

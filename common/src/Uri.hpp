@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <string>
+#include <sstream>
 #include "Lexer.hpp"
 
 namespace zia::http
@@ -47,6 +48,7 @@ namespace zia::http
 		static std::string decode(std::string_view s);
 
 	private:
+		void hostGroupToString(std::ostringstream &ss) const;
 		void parseHostGroup(UriLexer &lex);
 		void normalizeAll();
 		static void normalize(std::string &e, bool percentOnly = false);

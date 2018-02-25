@@ -225,7 +225,6 @@ namespace zia::core
 	
 		duplex.raw_resp = http::responseToRaw(duplex.resp);
 		m_networkModule->send(duplex.info.sock, duplex.raw_resp);
-		std::cout << "Request DONE" << std::endl;
 	}
 
 	void ModuleManager::configureModuleList(ModuleList &list, api::Conf const &conf)

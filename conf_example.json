@@ -1,15 +1,18 @@
 {
 	"modules_path": [".", "./libs", "./modules"],
-	"modules": {
-		"network": "zia_network",
-		"receive": [],
+  "modules": {
+    "network": "zia_network",
+    "receive": [ "zia_autoindex" ],
     "processing": [ "zia_php", "zia_getfile" ],
-		"send": []
-	},
+    "send": []
+  },
   "network": {
-    "port": 8080,
+    "port": 80,
     "cert": "./zia.crt",
     "key": "./zia.key"
+  },
+  "zia_autoindex": {
+    "default_files": [ "index.html", "index.php" ]
   },
   "zia_php": {},
   "zia_getfile": {}

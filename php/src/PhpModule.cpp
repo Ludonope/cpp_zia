@@ -5,13 +5,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iomanip>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "PhpModule.hpp"
 #include "Uri.hpp"
 #include "PhpQuery.hpp"
 
+// Evil hack to make this code work on Windows
 #if defined _WIN32
 #define popen _popen
 #define pclose _pclose
+#define stat _stat
 #endif
 
 using std::operator""s;

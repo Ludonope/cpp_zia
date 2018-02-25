@@ -1,4 +1,3 @@
-#include <sstream>
 #include <cctype>
 #include "Uri.hpp"
 #include "Lexer.hpp"
@@ -85,32 +84,6 @@ namespace zia::http
 	{
 		std::ostringstream ss;
 
-		ss << m_scheme << ':';
-
-		if (m_host != "")
-		{
-			ss << "//";
-
-			if (m_user != "")
-			{
-				ss << m_user;
-
-				if (m_password != "")
-				{
-					ss << ':' << m_password;
-				}
-
-				ss << '@';
-			}
-
-			ss << m_host;
-
-			if (m_port != defaultSchemePort(m_scheme))
-			{
-				ss << ':' << m_port;
-			}
-		}
-
 		if (m_path != "")
 		{
 			ss << '/' << m_path;
@@ -127,6 +100,38 @@ namespace zia::http
 		}
 
 		return ss.str();
+	}
+
+	void Uri::hostGroupToString(std::ostringstream &ss) const
+	{
+		if (m_scheme != "")
+		{
+			ss << m_scheme << ':';
+
+			if (m_host != "")
+			{
+				ss << "//";
+
+				if (m_user != "")
+				{
+					ss << m_user;
+
+					if (m_password != "")
+					{
+						ss << ':' << m_password;
+					}
+
+					ss << '@';
+				}
+
+				ss << m_host;
+
+				if (m_port != defaultSchemePort(m_scheme))
+				{
+					ss << ':' << m_port;
+				}
+			}
+		}
 	}
 
 	std::string Uri::decode(std::string_view s)
