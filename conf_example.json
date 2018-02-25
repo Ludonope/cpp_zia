@@ -12,7 +12,7 @@
     "key": "./zia.key"
   },
   "zia_custom_root": {
-    "root": "../../www/"
+    "root": "./www/"
   },
   "zia_autoindex": {
     "default_files": [ "index.html", "index.php" ]
