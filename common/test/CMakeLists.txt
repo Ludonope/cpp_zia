@@ -3,6 +3,12 @@ if (UNIX)
 	find_package(GTest CONFIG REQUIRED)
 	find_package(GMock CONFIG REQUIRED)
 
+	# Set ouput dir
+	unset(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+	unset(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+	unset(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+
+
 	# Set for each "series" of test
 	set(TEST_PREFIX common)
 	set(ZIA_LIB zia_common)

@@ -7,7 +7,7 @@
     "send": []
   },
   "network": {
-    "port": 80,
+    "port": 8080,
     "cert": "./zia.crt",
     "key": "./zia.key"
   },

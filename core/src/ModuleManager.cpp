@@ -212,29 +212,22 @@ namespace zia::core
 		};
 		bool done = false;
 
-		std::cout << "Debug " << 1 << std::endl;
 		if (moduleProcess(m_receiveModule, false) == false)
 		{
-			std::cout << "Debug " << 2 << std::endl;
 			done = true;
 		}
 
-		std::cout << "Debug " << 3 << std::endl;
 		if (!done && moduleProcess(m_processingModule, true) == false)
 		{
-			std::cout << "Debug " << 4 << std::endl;
 			duplex.resp.version = api::http::Version::http_1_1;
 			duplex.resp.status = api::http::common_status::not_implemented;
 			duplex.resp.reason = "Not-Implemented";
 			done = true;
 		}
-		std::cout << "Debug " << 5 << std::endl;
 		if (!done)
 		{
-			std::cout << "Debug " << 6 << std::endl;
 			moduleProcess(m_sendingModule, false);
 		}
-		std::cout << "Debug " << 7 << std::endl;
 
 		duplex.raw_resp = http::responseToRaw(duplex.resp);
 		m_networkModule->send(duplex.info.sock, duplex.raw_resp);
