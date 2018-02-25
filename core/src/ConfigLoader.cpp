@@ -43,7 +43,6 @@ namespace zia::core
 	{
 		try
 		{
-			std::cout << "Opening: " << m_filename << std::endl;
 			std::stringstream buffer;
 			std::ifstream file(m_filename.c_str());
 
